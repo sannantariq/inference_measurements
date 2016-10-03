@@ -39,10 +39,10 @@ if __name__ == "__main__":
                 try:
                     #In Windows, sometimes when a TCP program closes abruptly,
                     # a "Connection reset by peer" exception will be thrown
-                    data = sock.recv(RECV_BUFFER)
+                    data += sock.recv(RECV_BUFFER)
                     # echo back the client message
-                    if data:
-                        sock.send('OK ... ' + data)
+                    if data[len(data) - 3: len(data)] == "END":
+                        #Do the work
                  
                 # client disconnected, so remove from socket list
                 except:
