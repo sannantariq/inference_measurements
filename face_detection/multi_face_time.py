@@ -4,7 +4,7 @@ import timeit
 import os
 
 
-IMAGE_DIR = "./face_examples/faces/";
+IMAGE_DIR = "../../face_examples/faces/";
 
 def get_key(x):
 	_, i = x;
@@ -37,7 +37,7 @@ def setup_images():
 
 	# print times;
 
-	with open('plot_multi.txt', 'w') as f:
+	with open('plot_multi_faces_pi.txt', 'w') as f:
 		# f.write('Time(s)\tNo. of Pixels\n');
 		f.writelines(map(lambda (x, y): "%s\t%s\n" % (y, x), times));
 

@@ -26,7 +26,7 @@ if __name__ == "__main__":
  
         for sock in read_sockets:
              
-            #New connection
+            #New connectionsh
             if sock == server_socket:
                 # Handle the case in which there is a new connection recieved through server_socket
                 sockfd, addr = server_socket.accept()
