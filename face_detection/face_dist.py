@@ -4,6 +4,8 @@ import timeit
 import os
 
 
+def master():
+	
 IMAGE_DIR = "./face_examples/faces/";
 
 def get_key(x):
@@ -42,7 +44,11 @@ def setup_images():
 		f.writelines(map(lambda (x, y): "%s\t%s\n" % (y, x), times));
 
 def detect_face(matrix, cascade):
+	# global face_cascade
+	# global gray
+	# face_cascade.detectMultiScale(gray, 1.3, 5);
 	f = cascade.detectMultiScale(matrix, 1.3, 5);
+	# print len(f);
 	return f;
 
 setup_images()
