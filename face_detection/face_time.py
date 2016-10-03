@@ -4,7 +4,7 @@ import timeit
 import os
 
 
-IMAGE_DIR = "./face_examples/resolution/";
+IMAGE_DIR = "../../face_examples/resolution/";
 
 def get_key(x):
 	_, i = x;
@@ -25,7 +25,7 @@ def setup_images():
 	img_list = map(lambda (f, res): (cv2.imread("%s%s" % (IMAGE_DIR, f)), res), load_images());
 	img_list = map(lambda (f, res): (cv2.cvtColor(f, cv2.COLOR_BGR2GRAY), res), img_list);
 
-	N = 10;
+	N = 1;
 	times = [];
 	for (img, (w, h)) in img_list:
 		t = timeit.Timer(lambda : detect_face(img, face_cascade), "print 'setup'");
@@ -37,7 +37,7 @@ def setup_images():
 
 	# print times;
 
-	with open('plot.txt', 'w') as f:
+	with open('plot_faces_res_pi.txt', 'w') as f:
 		# f.write('Time(s)\tNo. of Pixels\n');
 		f.writelines(map(lambda (x, y): "%s\t%s\n" % (y, x), times));
 
