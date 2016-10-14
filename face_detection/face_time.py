@@ -2,6 +2,9 @@ import numpy as np
 import cv2
 import timeit
 import os
+import json
+import pickle
+import socket, select
 
 
 IMAGE_DIR = "../../face_examples/resolution/";
@@ -41,35 +44,6 @@ def setup_images():
 		# f.write('Time(s)\tNo. of Pixels\n');
 		f.writelines(map(lambda (x, y): "%s\t%s\n" % (y, x), times));
 
-
-
-
-
-
-
-
-
-def setup():
-	# global gray;
-	# global face_cascade;
-	face_cascade = cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_frontalface_default.xml');
-
-	cap = cv2.VideoCapture(0);
-	width, height = 320, 240;
-	cap.set(3, width);
-	cap.set(4, height);
-
-	if not cap.isOpened():
-		cap.open();
-
-	ret, frame = cap.read();
-
-	gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY);
-
-	cap.release();
-
-	return (gray, face_cascade);
-
 def detect_face(matrix, cascade):
 	# global face_cascade
 	# global gray
@@ -82,38 +56,148 @@ def calculate_time():
 	print t.timeit(20);
 	# detect_face(matrix, cascade);
 
-setup_images()
+# setup_images()
+# imgs = load_images();
+# img_list = map(lambda (f, res): (cv2.imread("%s%s" % (IMAGE_DIR, f)), res), load_images());
+# serializ = pickle.dumps(img_list[0]);
 
 
-# t = timeit.Timer(work, '');
+class mysocket:
+    '''demonstration class only
+      - coded for clarity, not efficiency
+    '''
 
-# print t.timeit(20);
-	
-# calculate_time()
+    def __init__(self, sock=None, BUF_SIZE = 4096):
+        self.BUF_SIZE = BUF_SIZE;
+        if sock is None:
+            self.sock = socket.socket(
+                socket.AF_INET, socket.SOCK_STREAM)
+        else:
+            self.sock = sock
 
-# face_cascade = cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_frontalface_default.xml');
+    def connect(self, host, port):
+        self.sock.connect((host, port))
 
-# cap = cv2.VideoCapture(0);
+    def mysend(self, msg):
+        totalsent = 0
+        msg += "\END\n";
+        MSGLEN = len(msg);
+        while totalsent < MSGLEN:
+            sent = self.sock.send(msg[totalsent:])
+            if sent == 0:
+                raise RuntimeError("socket connection broken")
+            totalsent = totalsent + sent
 
-# if not cap.isOpened():
-# 	cap.open();
+    def myreceive(self):
+        print "Receiveing Things..."
+        chunks = []
+        MSG_COMP = -1
+        last_msg = '';
+        while MSG_COMP < 0:
+            chunk = self.sock.recv(self.BUF_SIZE);
+            if chunk == '':
+                raise RuntimeError("socket connection broken")
+            chunks.append(chunk)
+            last_msg = ''.join(chunks[-2:]);
+            # print "New Chunk:%s" % chunk;
+            # print chunks;
+            # print "SERACHING in:%s" % last_msg;
+            MSG_COMP = last_msg.find("\END", max(0, len(last_msg) - len(chunks[-1]) - 10))
+        return ''.join([''.join(chunks[:-2]), last_msg[:MSG_COMP]])
+        # return ''.join(chunks)
 
-# N = 1;
-# detected = 0;
-# for i in range(N):
-# 	ret, frame = cap.read();
+def process_data(data):
+    print "Received:%s" % data;
 
-# 	gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY);
 
-# 	timeit
-# 	# faces = detect_face(gray, face_cascade);
+def client():
+	host = '' 
+	port = 50001
+	backlog = 5 
+	size = 1024 
+	server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	# server = mysocket(server);
+	server.bind((host,port)) 
+	server.listen(backlog) 
+	input = [server,sys.stdin] 
+	running = 1 
+	client_list = []
+	while running: 
+	    inputready,outputready,exceptready = select.select(input,[],[], 1) 
 
-# 	# detected += len(faces);
+	    for s in inputready: 
 
-# 	# for (x, y, w, h) in faces:
-# 	# 	cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2);
+	        if s == server: 
+	            # handle the server socket 
+	            client, address = server.accept() 
+	            input.append(client); 
+	            client_list.append(client);
 
-# 	# cv2.imshow('frame', frame);
-# cap.release();
-# cv2.destroyAllWindows()
-# print "Percentage Detection = %3f" % (detected * 1.0 / N)
+	        elif s == sys.stdin: 
+	            # handle standard input 
+	            junk = sys.stdin.readline() 
+	            running = 0 
+
+	        else: 
+	            # handle all other sockets 
+	            try:
+	                data = mysocket(s).myreceive();
+	                if data: 
+	                    process_data(data);
+	                    mysocket(s).mysend(data);
+	            except RuntimeError:
+	                s.close() 
+	                input.remove(s) 
+
+	    if len(client_list) == 1:
+
+
+	server.close()
+
+def service():
+	def client():
+	host = '' 
+	port = 50001
+	backlog = 5 
+	size = 1024 
+	server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	# server = mysocket(server);
+	server.bind((host,port)) 
+	server.listen(backlog) 
+	input = [server,sys.stdin] 
+	running = 1 
+	client_list = []
+	while running: 
+	    inputready,outputready,exceptready = select.select(input,[],[], 1) 
+
+	    for s in inputready: 
+
+	        if s == server: 
+	            # handle the server socket 
+	            client, address = server.accept() 
+	            input.append(client); 
+	            client_list.append(client);
+
+	        elif s == sys.stdin: 
+	            # handle standard input 
+	            junk = sys.stdin.readline() 
+	            running = 0 
+
+	        else: 
+	            # handle all other sockets 
+	            try:
+	                data = mysocket(s).myreceive();
+	                if data: 
+	                    process_data(data);
+	                    mysocket(s).mysend(data);
+
+	            except RuntimeError:
+	                s.close() 
+	                input.remove(s) 
+
+	    if len(client_list) == 1:
+	    	
+
+	server.close()
+
+# client()
