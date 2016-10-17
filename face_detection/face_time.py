@@ -5,6 +5,7 @@ import os
 import json
 import pickle
 import socket, select
+import sys
 
 
 IMAGE_DIR = "../../face_examples/resolution/";
@@ -27,8 +28,13 @@ def setup_images():
 	face_cascade = cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_frontalface_default.xml');
 	img_list = map(lambda (f, res): (cv2.imread("%s%s" % (IMAGE_DIR, f)), res), load_images());
 	img_list = map(lambda (f, res): (cv2.cvtColor(f, cv2.COLOR_BGR2GRAY), res), img_list);
-
+	# img = img_list[0];
+	# # print type(img[1]);
+	# # print img[1]
+	# print np.hsplit(img[0], 2);
+	# # print img[0]
 	N = 1;
+	# sys.exit()
 	times = [];
 	for (img, (w, h)) in img_list:
 		t = timeit.Timer(lambda : detect_face(img, face_cascade), "print 'setup'");
@@ -110,94 +116,96 @@ def process_data(data):
     print "Received:%s" % data;
 
 
-def client():
-	host = '' 
-	port = 50001
-	backlog = 5 
-	size = 1024 
-	server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	# server = mysocket(server);
-	server.bind((host,port)) 
-	server.listen(backlog) 
-	input = [server,sys.stdin] 
-	running = 1 
-	client_list = []
-	while running: 
-	    inputready,outputready,exceptready = select.select(input,[],[], 1) 
+# def client():
+# 	host = '' 
+# 	port = 50001
+# 	backlog = 5 
+# 	size = 1024 
+# 	server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# 	# server = mysocket(server);
+# 	server.bind((host,port)) 
+# 	server.listen(backlog) 
+# 	input = [server,sys.stdin] 
+# 	running = 1 
+# 	client_list = []
+# 	while running: 
+# 	    inputready,outputready,exceptready = select.select(input,[],[], 1) 
 
-	    for s in inputready: 
+# 	    for s in inputready: 
 
-	        if s == server: 
-	            # handle the server socket 
-	            client, address = server.accept() 
-	            input.append(client); 
-	            client_list.append(client);
+# 	        if s == server: 
+# 	            # handle the server socket 
+# 	            client, address = server.accept() 
+# 	            input.append(client); 
+# 	            client_list.append(client);
 
-	        elif s == sys.stdin: 
-	            # handle standard input 
-	            junk = sys.stdin.readline() 
-	            running = 0 
+# 	        elif s == sys.stdin: 
+# 	            # handle standard input 
+# 	            junk = sys.stdin.readline() 
+# 	            running = 0 
 
-	        else: 
-	            # handle all other sockets 
-	            try:
-	                data = mysocket(s).myreceive();
-	                if data: 
-	                    process_data(data);
-	                    mysocket(s).mysend(data);
-	            except RuntimeError:
-	                s.close() 
-	                input.remove(s) 
+# 	        else: 
+# 	            # handle all other sockets 
+# 	            try:
+# 	                data = mysocket(s).myreceive();
+# 	                if data: 
+# 	                    process_data(data);
+# 	                    mysocket(s).mysend(data);
+# 	            except RuntimeError:
+# 	                s.close() 
+# 	                input.remove(s) 
 
-	    if len(client_list) == 1:
+# 	    if len(client_list) == 1:
 
 
-	server.close()
+# 	server.close()
 
-def service():
-	def client():
-	host = '' 
-	port = 50001
-	backlog = 5 
-	size = 1024 
-	server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	# server = mysocket(server);
-	server.bind((host,port)) 
-	server.listen(backlog) 
-	input = [server,sys.stdin] 
-	running = 1 
-	client_list = []
-	while running: 
-	    inputready,outputready,exceptready = select.select(input,[],[], 1) 
+# def service():
+# 	def client():
+# 	host = '' 
+# 	port = 50001
+# 	backlog = 5 
+# 	size = 1024 
+# 	server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# 	# server = mysocket(server);
+# 	server.bind((host,port)) 
+# 	server.listen(backlog) 
+# 	input = [server,sys.stdin] 
+# 	running = 1 
+# 	client_list = []
+# 	while running: 
+# 	    inputready,outputready,exceptready = select.select(input,[],[], 1) 
 
-	    for s in inputready: 
+# 	    for s in inputready: 
 
-	        if s == server: 
-	            # handle the server socket 
-	            client, address = server.accept() 
-	            input.append(client); 
-	            client_list.append(client);
+# 	        if s == server: 
+# 	            # handle the server socket 
+# 	            client, address = server.accept() 
+# 	            input.append(client); 
+# 	            client_list.append(client);
 
-	        elif s == sys.stdin: 
-	            # handle standard input 
-	            junk = sys.stdin.readline() 
-	            running = 0 
+# 	        elif s == sys.stdin: 
+# 	            # handle standard input 
+# 	            junk = sys.stdin.readline() 
+# 	            running = 0 
 
-	        else: 
-	            # handle all other sockets 
-	            try:
-	                data = mysocket(s).myreceive();
-	                if data: 
-	                    process_data(data);
-	                    mysocket(s).mysend(data);
+# 	        else: 
+# 	            # handle all other sockets 
+# 	            try:
+# 	                data = mysocket(s).myreceive();
+# 	                if data: 
+# 	                    process_data(data);
+# 	                    mysocket(s).mysend(data);
 
-	            except RuntimeError:
-	                s.close() 
-	                input.remove(s) 
+# 	            except RuntimeError:
+# 	                s.close() 
+# 	                input.remove(s) 
 
-	    if len(client_list) == 1:
+# 	    if len(client_list) == 1:
 	    	
 
-	server.close()
+# 	server.close()
 
 # client()
+
+setup_images()

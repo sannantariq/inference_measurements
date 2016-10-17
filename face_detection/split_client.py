@@ -7,8 +7,9 @@ import time
 import pickle
 import cv2
 import os
+import numpy as np
 
-IMAGE_DIR = "../../face_examples/resolution/";
+IMAGE_DIR = "../../face_examples/faces/";
 
 class mysocket:
     '''demonstration class only
@@ -72,12 +73,14 @@ def send_tasks(connected_service):
     tasks_sent = 0;
     img_list = load_images();
     print len(img_list)
-    img = img_list[11];
+    img = img_list[4];
     # print img
     img = cv2.imread("%s%s" % (IMAGE_DIR, img[0]));
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY);
     # print img
-    task_list = map(lambda x: (x, img), frames);
+    # task_list = map(lambda x: (x, img), frames);
+    task_list = np.hsplit(img, task_num);
+    task_list = zip(frames, task_list);
     start_time = time.time();
     # print start_time;
     for (i, img) in task_list:
