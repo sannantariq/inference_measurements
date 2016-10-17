@@ -12,7 +12,7 @@ class mysocket:
       - coded for clarity, not efficiency
     '''
 
-    def __init__(self, sock=None, BUF_SIZE = 4096):
+    def __init__(self, sock=None, BUF_SIZE = 8192):
         self.BUF_SIZE = BUF_SIZE;
         if sock is None:
             self.sock = socket.socket(
@@ -51,18 +51,18 @@ class mysocket:
         return ''.join([''.join(chunks[:-2]), last_msg[:MSG_COMP]])
         # return ''.join(chunks)
 
-def detect_face(matrix):
-    matrix = cv2.cvtColor(matrix, cv2.COLOR_BGR2GRAY);
-    cascade = cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_frontalface_default.xml')
+def detect_face(matrix, cascade):
+    # matrix = cv2.cvtColor(matrix, cv2.COLOR_BGR2GRAY);
+    
     return cascade.detectMultiScale(matrix, 1.3, 5);
 
-def process_data(data):
+def process_data(data, cascade):
     # print len(data);
     data = pickle.loads(data);
     # cv2.imshow('img', pickle.loads(data));
     # cv2.waitKey(0);
     # cv2.destroyAllWindows()
-    return pickle.dumps(detect_face(data));
+    return pickle.dumps(detect_face(data, cascade));
 
 port = int(sys.argv[1]);
 # print port
@@ -76,7 +76,8 @@ server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # server = mysocket(server);
 server.bind((host,port)) 
 server.listen(backlog) 
-input = [server,sys.stdin] 
+input = [server,sys.stdin]
+cascade = cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_frontalface_default.xml')
 running = 1 
 while running: 
     inputready,outputready,exceptready = select.select(input,[],[], 1) 
@@ -99,7 +100,7 @@ while running:
             try:
                 data = mysocket(s).myreceive();
                 if data: 
-                    reply = process_data(data);
+                    reply = process_data(data, cascade);
                     # print "Sending reply";
                     # print pickle.loads(reply);
                     mysocket(s).mysend(reply);

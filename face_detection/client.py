@@ -15,7 +15,7 @@ class mysocket:
       - coded for clarity, not efficiency
     '''
 
-    def __init__(self, sock=None, BUF_SIZE = 4096):
+    def __init__(self, sock=None, BUF_SIZE = 8192):
         self.BUF_SIZE = BUF_SIZE;
         if sock is None:
             self.sock = socket.socket(
@@ -72,13 +72,14 @@ def send_tasks(connected_service):
     tasks_sent = 0;
     img_list = load_images();
     print len(img_list)
-    img = img_list[5];
+    img = img_list[0];
     # print img
     img = cv2.imread("%s%s" % (IMAGE_DIR, img[0]));
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY);
     # print img
     task_list = map(lambda x: (x, img), frames);
     start_time = time.time();
-    print start_time;
+    # print start_time;
     for (i, img) in task_list:
         mysocket(connected_service[i % len(connected_service)]).mysend(pickle.dumps(img));
         tasks_sent +=1;
@@ -123,7 +124,7 @@ def setup_images():
 # service_list = [('localhost', 50000), ('localhost', 50001)];
 rpi_master_addr = ('172.20.64.128', 50000);
 rpi_worker_0 = ('172.20.64.77', 50000);
-service_list = [rpi_master_addr];
+service_list = [rpi_master_addr, rpi_worker_0];
 host = '' 
 port = 40000
 backlog = 5
@@ -172,13 +173,13 @@ while running:
                 if len(results) == tasks_sent:
                     running = 0;
                     time_taken = time.time() - start_time;
-                    # print time_taken
+                    print "Total_time", time_taken
 
             except RuntimeError:
                 s.close()
                 input.remove(s)
 
-print "Time Taken:", time_taken
+print "Time Taken:", time_taken/2.0
 [s.close() for s in connected_service]
 server.close()
 
