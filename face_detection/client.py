@@ -15,7 +15,7 @@ class mysocket:
       - coded for clarity, not efficiency
     '''
 
-    def __init__(self, sock=None, BUF_SIZE = 4):
+    def __init__(self, sock=None, BUF_SIZE = 4096):
         self.BUF_SIZE = BUF_SIZE;
         if sock is None:
             self.sock = socket.socket(
@@ -67,14 +67,16 @@ def connect_to_services(service_list):
     return connected_service;
 
 def send_tasks(connected_service):
+    tasks_sent = 0;
     img_list = load_images();
-    img = img_list[0];
+    # img = img_list[0];
     # print img
     img = cv2.imread("%s%s" % (IMAGE_DIR, img[0]));
     # print img
     for s in connected_service:
         mysocket(s).mysend(pickle.dumps(img));
-
+        tasks_sent +=1;
+    return tasks_sent;
 
 def get_key(x):
     _, i = x;
@@ -124,7 +126,10 @@ server.listen(backlog)
 input = [server,sys.stdin]
 running = 1
 connected_service = [];
+results = []
+tasks_sent = 0;
 while running:
+    print "Waiting for activity..."
     inputready,outputready,exceptready = select.select(input,[],[], 1)
 
     for s in inputready: 
@@ -138,20 +143,29 @@ while running:
             # handle standard input 
             junk = sys.stdin.readline()
             connected_service = connect_to_services(service_list);
-            send_tasks(connected_service);
+            input.extend(connected_service);
+            tasks_sent = send_tasks(connected_service);
 
-            running = 0
+            # running = 0
 
         else:
             # handle all other sockets 
             try:
                 data = mysocket(s).myreceive();
-                if data:
-                    process_data(data);
-                    mysocket(s).mysend(data);
+                # print "Received data:"
+                # print data
+                results.append(data);
+                # print results;
+                if len(results) == tasks_sent:
+                    running = 0;
+
             except RuntimeError:
                 s.close()
                 input.remove(s)
 
 [s.close() for s in connected_service]
 server.close()
+
+results = map(lambda x: pickle.loads(x), results);
+print results
+# [print r for r in results];

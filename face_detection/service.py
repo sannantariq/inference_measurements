@@ -4,13 +4,15 @@ import socket, select
 import json
 import sys
 import time
+import cv2
+import pickle
 
 class mysocket:
     '''demonstration class only
       - coded for clarity, not efficiency
     '''
 
-    def __init__(self, sock=None, BUF_SIZE = 4):
+    def __init__(self, sock=None, BUF_SIZE = 4096):
         self.BUF_SIZE = BUF_SIZE;
         if sock is None:
             self.sock = socket.socket(
@@ -49,8 +51,18 @@ class mysocket:
         return ''.join([''.join(chunks[:-2]), last_msg[:MSG_COMP]])
         # return ''.join(chunks)
 
+def detect_face(matrix):
+    matrix = cv2.cvtColor(matrix, cv2.COLOR_BGR2GRAY);
+    cascade = cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_frontalface_default.xml')
+    return cascade.detectMultiScale(matrix, 1.3, 5);
+
 def process_data(data):
-    print len(data)
+    print len(data);
+    data = pickle.loads(data);
+    # cv2.imshow('img', pickle.loads(data));
+    # cv2.waitKey(0);
+    # cv2.destroyAllWindows()
+    return pickle.dumps(detect_face(data));
 
 port = int(sys.argv[1]);
 # print port
@@ -87,8 +99,10 @@ while running:
             try:
                 data = mysocket(s).myreceive();
                 if data: 
-                    process_data(data);
-                    mysocket(s).mysend(data);
+                    reply = process_data(data);
+                    print "Sending reply";
+                    print pickle.loads(reply);
+                    mysocket(s).mysend(reply);
             except RuntimeError:
                 s.close() 
                 input.remove(s)
