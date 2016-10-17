@@ -37,7 +37,7 @@ class mysocket:
             totalsent = totalsent + sent
 
     def myreceive(self):
-        print "Receiving Things..."
+        # print "Receiving Things..."
         chunks = []
         MSG_COMP = -1
         last_msg = '';
@@ -67,16 +67,22 @@ def connect_to_services(service_list):
     return connected_service;
 
 def send_tasks(connected_service):
+    task_num = 2
+    frames = range(task_num);
     tasks_sent = 0;
     img_list = load_images();
-    # img = img_list[0];
+    print len(img_list)
+    img = img_list[5];
     # print img
     img = cv2.imread("%s%s" % (IMAGE_DIR, img[0]));
     # print img
-    for s in connected_service:
-        mysocket(s).mysend(pickle.dumps(img));
+    task_list = map(lambda x: (x, img), frames);
+    start_time = time.time();
+    print start_time;
+    for (i, img) in task_list:
+        mysocket(connected_service[i % len(connected_service)]).mysend(pickle.dumps(img));
         tasks_sent +=1;
-    return tasks_sent;
+    return (start_time, tasks_sent);
 
 def get_key(x):
     _, i = x;
@@ -109,12 +115,15 @@ def setup_images():
 
     print times;
 
-    with open('plot_faces_res_pi.txt', 'w') as f:
+    with open('plot_2-pis_res.txt', 'w') as f:
         # f.write('Time(s)\tNo. of Pixels\n');
         f.writelines(map(lambda (x, y): "%s\t%s\n" % (y, x), times));
 
 
-service_list = [('localhost', 50000), ('localhost', 50001)];
+# service_list = [('localhost', 50000), ('localhost', 50001)];
+rpi_master_addr = ('172.20.64.128', 50000);
+rpi_worker_0 = ('172.20.64.77', 50000);
+service_list = [rpi_master_addr];
 host = '' 
 port = 40000
 backlog = 5
@@ -128,8 +137,10 @@ running = 1
 connected_service = [];
 results = []
 tasks_sent = 0;
+time_taken = 0;
+# start_time = time.clock();
 while running:
-    print "Waiting for activity..."
+    # print "Waiting for activity..."
     inputready,outputready,exceptready = select.select(input,[],[], 1)
 
     for s in inputready: 
@@ -141,13 +152,15 @@ while running:
 
         elif s == sys.stdin:
             # handle standard input 
-            junk = sys.stdin.readline()
-            connected_service = connect_to_services(service_list);
-            input.extend(connected_service);
-            tasks_sent = send_tasks(connected_service);
-
+            cmd = sys.stdin.readline()
+            if 'connect' in cmd:
+                connected_service = connect_to_services(service_list);
+                input.extend(connected_service);
+            elif 'work' in cmd:
+                start_time, tasks_sent = send_tasks(connected_service);
+            else:
+                running = 0;
             # running = 0
-
         else:
             # handle all other sockets 
             try:
@@ -158,11 +171,14 @@ while running:
                 # print results;
                 if len(results) == tasks_sent:
                     running = 0;
+                    time_taken = time.time() - start_time;
+                    # print time_taken
 
             except RuntimeError:
                 s.close()
                 input.remove(s)
 
+print "Time Taken:", time_taken
 [s.close() for s in connected_service]
 server.close()
 

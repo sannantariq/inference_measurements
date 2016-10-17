@@ -34,7 +34,7 @@ class mysocket:
             totalsent = totalsent + sent
 
     def myreceive(self):
-        print "Receiving Things..."
+        # print "Receiving Things..."
         chunks = []
         MSG_COMP = -1
         last_msg = '';
@@ -57,7 +57,7 @@ def detect_face(matrix):
     return cascade.detectMultiScale(matrix, 1.3, 5);
 
 def process_data(data):
-    print len(data);
+    # print len(data);
     data = pickle.loads(data);
     # cv2.imshow('img', pickle.loads(data));
     # cv2.waitKey(0);
@@ -100,8 +100,8 @@ while running:
                 data = mysocket(s).myreceive();
                 if data: 
                     reply = process_data(data);
-                    print "Sending reply";
-                    print pickle.loads(reply);
+                    # print "Sending reply";
+                    # print pickle.loads(reply);
                     mysocket(s).mysend(reply);
             except RuntimeError:
                 s.close() 
