@@ -47,10 +47,10 @@ def setup_images():
 	img_list = map(lambda (f): cv2.cvtColor(f, cv2.COLOR_BGR2GRAY), img_list);
 	myimg = img_list[0];
 	img_list = map(lambda (x): (myimg, x), feat_list)
-	# print img_list
+	img_list = img_list[1:2];
 	# sys.exit()
 
-	N = 10;
+	N = 1;
 	times = [];
 	for (img, l) in img_list:
 		t = timeit.Timer(lambda : detect_face(img, face_cascade, l), "print 'setup'");
@@ -83,6 +83,7 @@ def detect_face(matrix, cascade, cascade_list):
 			res.append(extra_cascade.detectMultiScale(roi));
 		# print len(eyes);
 	# print len(f);
+	print res
 	return res;
 
 # print split_list(range(5));

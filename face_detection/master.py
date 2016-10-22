@@ -1,5 +1,5 @@
 import argparse, socket, sys, select
-
+import Queue as Q
 class mysocket:
     '''demonstration class only
       - coded for clarity, not efficiency
@@ -82,6 +82,7 @@ class Communicator(object):
 		self.listen_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
 		self.listen_socket.bind(self.addr);
 		self.listen_socket.listen(self.backlog)
+		self.listen_socket.setblocking(0);
 		self.running = 1;
 		self.input_socks = [self.listen_socket, sys.stdin];
 
