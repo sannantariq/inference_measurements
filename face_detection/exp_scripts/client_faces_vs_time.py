@@ -68,14 +68,26 @@ def load_images():
     return img_list;
 
 def worker_thread(input_queue, service_socket):
-   while True:
-    if can_run and not input_queue.empty():
-      (i, task) = input_queue.get();
-      start_time = time.time();
-      mysocket(service_socket).mysend(pickle.dumps(task));
-      response, process_time = pickle.loads(mysocket(service_socket).myreceive());
-      local_dict[i] = (time.time() - start_time, process_time);
-      input_queue.task_done();
+	while True:
+		if can_run and not input_queue.empty():
+			# print "Getting work done"
+			# res = input_queue.get();
+			# print len(res);
+			# print len(res[0]);
+			# print res
+			# (i, task) = res;
+			i, task = input_queue.get();
+			start_time = time.time();
+			mysocket(service_socket).mysend(pickle.dumps(task));
+			response, process_time = pickle.loads(mysocket(service_socket).myreceive());
+			overall_time = time.time() - start_time;
+			prev_overall_time, prev_process_time = local_dict[i];
+			if prev_process_time < 0 and prev_overall_time < 0:
+				local_dict[i] = (overall_time, process_time);
+			else:
+				local_dict[i] = (overall_time + prev_overall_time, process_time + prev_process_time);
+				# local_dict[i] = (time.time() - start_time, process_time);
+			input_queue.task_done();
 		
 def main():
 	parser = argparse.ArgumentParser();
@@ -132,14 +144,23 @@ def splitFrame(frame, min_splits):
         map(lambda x: splits.extend(x), temp);
         # print splits[0].shape;
         # print len(splits)
+    # for ar in splits:
+    # 	print ar.shape
     return splits;
 
 def generateTaskQueueSplits(task_list, service_list):
     input_queue = Queue.Queue();
     for (i, task) in enumerate(task_list):
-        # splits = enumerate(splitFrame(task, len(service_list)));
-        # print len(splits);
-        input_queue.put((i, list(enumerate(splitFrame(task, len(service_list))))));
+        splits = splitFrame(task, len(service_list));
+        tmp = map(lambda x: (x, splits), range(RUNS));
+        tmp = map(lambda (x, sp): map(lambda y: (x, y), sp), tmp);
+        tmp_final = [];
+        map(lambda x: tmp_final.extend(x), tmp);
+        # print len(tmp_final);
+        # for l in tmp_final:
+        # 	print len(l);
+        # print len(tmp_final[0]);
+        input_queue.put((i, tmp_final));
     return input_queue;
         
 
@@ -153,9 +174,9 @@ def generateTaskQueueCopies(task_list):
 """
 Experiment Configuration
 """
-IMAGE_DIR = "../../../face_examples/resolution/";
+IMAGE_DIR = "../../../face_examples/faces/";
 OUPUT_DIR = "../raw_data/";
-EXP = "ResVsTime-LT-1.txt";
+EXP = "FacesVsTime-LT-1.txt";
 RUNS = 5;
 
 
@@ -181,7 +202,7 @@ img_list = map(lambda (f, res): (cv2.cvtColor(f, cv2.COLOR_BGR2GRAY), res), img_
 img_list = map(lambda (f, res): f, img_list);
 
 # input_queue = generateTaskQueueSplits(img_list, service_list);
-input_queue = generateTaskQueueCopies(img_list);
+input_queue = generateTaskQueueSplits(img_list, service_list);
 
 
 service_list = map(lambda x: (socket.socket(socket.AF_INET, socket.SOCK_STREAM), x), service_list);
@@ -193,6 +214,7 @@ service_socket_list = map(lambda (x, _): x, service_list);
 local_dict = None;
 task_queue = Queue.Queue();
 can_run = False;
+
 worker_threads = map(lambda s: Thread(target = worker_thread, args = (task_queue, s, )), service_socket_list);
 map(lambda x: x.setDaemon(True), worker_threads);
 map(lambda x: x.start(), worker_threads);
@@ -211,10 +233,10 @@ final = map(lambda (i, size): (size, (results[i][0], results[i][1])), final);
 print final
 
 
-
+# print input_queue.qsize();
 # while not input_queue.empty():
 #     print input_queue.get()
-# print input_queue.qsize();
+
 # print len(input_queue.get()[1]);
 
 # input_queue.join();

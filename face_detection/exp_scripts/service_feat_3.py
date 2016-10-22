@@ -136,7 +136,7 @@ while running:
             try:
                 data = mysocket(s).myreceive();
                 if data: 
-                    reply = process_data(data, feat_list);
+                    reply = process_data(data, feat_list_3);
                     # print "Sending reply";
                     # print pickle.loads(reply);
                     mysocket(s).mysend(reply);
