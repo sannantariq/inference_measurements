@@ -53,6 +53,7 @@ class mysocket:
 
 
 def process_data(data, feat_list):
+    start_time = time.time()
     res = {};
     matrix = pickle.loads(data);
     if 'face' in feat_list:
@@ -69,7 +70,8 @@ def process_data(data, feat_list):
                 res[feat] = res.get(feat, [])
                 res[feat].append(detected_area);
 
-    return pickle.dumps(res);
+
+    return pickle.dumps((res, time.time() - start_time));
 
 
 
@@ -107,7 +109,8 @@ cascade_dict = {'face': cv2.CascadeClassifier('/usr/share/opencv/haarcascades/ha
                 'smile': cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_smile.xml')
                 }
 
-feat_list = ['face', 'nose', 'eye_left', 'eye_right'];
+# feat_list = ['face', 'nose', 'eye_left', 'eye_right'];
+feat_list = ['face'];
 running = 1 
 while running: 
     inputready,outputready,exceptready = select.select(input,[],[], 1) 
