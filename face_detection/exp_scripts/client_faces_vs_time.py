@@ -200,6 +200,9 @@ init_img_list = load_images();
 img_list = map(lambda (f, res): (cv2.imread("%s%s" % (IMAGE_DIR, f)), res), init_img_list);
 img_list = map(lambda (f, res): (cv2.cvtColor(f, cv2.COLOR_BGR2GRAY), res), img_list);
 img_list = map(lambda (f, res): f, img_list);
+for i in img_list:
+	print i.shape;
+sys.exit()
 
 # input_queue = generateTaskQueueSplits(img_list, service_list);
 input_queue = generateTaskQueueSplits(img_list, service_list);
