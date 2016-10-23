@@ -155,8 +155,8 @@ Experiment Configuration
 """
 IMAGE_DIR = "../../../face_examples/resolution/";
 OUPUT_DIR = "../raw_data/";
-EXP = "ResVsTime-LT-1.txt";
-RUNS = 5;
+EXP = "res-V-time_ED-1_feat-1.txt";
+RUNS = 1;
 
 
 
@@ -166,8 +166,9 @@ Initialization of the experiment
 """
 outfile = "%s%s" % (OUPUT_DIR, EXP);
 results = {};
-service_list = [('localhost', 50000), ('localhost', 50001)];
-# service_list = [('172.20.99.60', 50000)];
+# service_list = [('localhost', 50000), ('localhost', 50001)];
+# service_list = [('localhost', 50000)];
+service_list = [('172.20.99.60', 50000)];
 
 
 
@@ -208,8 +209,12 @@ while not input_queue.empty():
 
 final = enumerate(map(lambda (_, s): s, init_img_list));
 final = map(lambda (i, size): (size, (results[i][0], results[i][1])), final);
-print final
 
+
+print final
+with open(outfile, 'w') as f:
+    for (s, (o, p)) in final:
+        f.write("%f\t%s\t%s\n" % (int(s) / (1000 * 1000.0), o , p))
 
 
 # while not input_queue.empty():
