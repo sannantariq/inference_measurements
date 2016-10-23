@@ -59,6 +59,7 @@ def process_data(data, feat_list):
     matrix = pickle.loads(data);
     if 'face' in feat_list:
         res['face'] = cascade_dict['face'].detectMultiScale(matrix, 1.3, 5);
+        print "Faces found:", len(res["face"]);
 
     for (x,y,w,h) in res['face']:
         # print "Found Face";
