@@ -4,13 +4,13 @@ from threading import Thread;
 
 """
 
--	Create a queue with all the tasks
--	Create a thread for each service
--	The thread consumes tasks from
-	the shared queue
--	Each thread itself is sequential
--	The service itself is probably
-	I/O multiplexed
+-   Create a queue with all the tasks
+-   Create a thread for each service
+-   The thread consumes tasks from
+    the shared queue
+-   Each thread itself is sequential
+-   The service itself is probably
+    I/O multiplexed
 
 """
 
@@ -52,7 +52,7 @@ class mysocket:
             last_msg = ''.join(chunks[-2:]);
 
             MSG_COMP = last_msg.find("\END", max(0, len(last_msg) - 
-            	len(chunks[-1]) - 10))
+                len(chunks[-1]) - 10))
             
         return ''.join([''.join(chunks[:-2]), last_msg[:MSG_COMP]])
 
@@ -76,19 +76,19 @@ def worker_thread(input_queue, service_socket):
       response, process_time = pickle.loads(mysocket(service_socket).myreceive());
       local_dict[i] = (time.time() - start_time, process_time);
       input_queue.task_done();
-		
+        
 def main():
-	parser = argparse.ArgumentParser();
-	parser.add_argument("-p", "--port",
-		help = "Port to serve on (Default is 50000)",
-		type = int,
-		default = 50000);
+    parser = argparse.ArgumentParser();
+    parser.add_argument("-p", "--port",
+        help = "Port to serve on (Default is 50000)",
+        type = int,
+        default = 50000);
 
-	args = parser.parse_args();
-	
-	server = Communicator(args.port, []);
-	server.listen();
-	# print args.port
+    args = parser.parse_args();
+    
+    server = Communicator(args.port, []);
+    server.listen();
+    # print args.port
 
 def get_key(x):
     # _, i = x;
@@ -155,7 +155,7 @@ Experiment Configuration
 """
 IMAGE_DIR = "../../../face_examples/resolution/";
 OUPUT_DIR = "../raw_data/";
-EXP = "res-V-time_ED-1_feat-3.txt";
+EXP = "test3-res-V-time_ED-1_feat-1.txt";
 RUNS = 1;
 
 
@@ -168,15 +168,35 @@ outfile = "%s%s" % (OUPUT_DIR, EXP);
 results = {};
 # service_list = [('localhost', 50000), ('localhost', 50001)];
 # service_list = [('localhost', 50000)];
-service_list = [('172.20.96.110', 50001)];
+# service_list = [('172.20.96.110', 50000)];
+# service_list = [('172.20.99.60', 50000)];
+# service_list = [('172.20.99.60', 50000), ()]
 
+lt_feat_1 = ('localhost', 50000);
+lt_feat_2 = ('localhost', 50001);
+lt_feat_3 = ('localhost', 50002);
 
+ed1_feat_1 = ('172.20.99.60', 50000);
+ed1_feat_2 = ('172.20.99.60', 50001);
+ed1_feat_3 = ('172.20.99.60', 50002);
 
+ed2_feat_1 = ('172.20.96.110', 50000);
+ed2_feat_2 = ('172.20.96.110', 50001);
+ed2_feat_3 = ('172.20.96.110', 50002);
+
+rpi1_feat_1 = ('172.20.96.110', 50000);
+rpi1_feat_2 = ('172.20.96.110', 50001);
+rpi1_feat_3 = ('172.20.96.110', 50002);
+rpi2_feat_1 = ('172.20.96.110', 50000);
+rpi2_feat_2 = ('172.20.96.110', 50001);
+rpi2_feat_3 = ('172.20.96.110', 50002);
+
+service_list = [ed2_feat_1, ed2_feat_2];
 """
 Actual Experiment
 """
 
-init_img_list = load_images();
+init_img_list = load_images()[:2];
 img_list = map(lambda (f, res): (cv2.imread("%s%s" % (IMAGE_DIR, f)), res), init_img_list);
 img_list = map(lambda (f, res): (cv2.cvtColor(f, cv2.COLOR_BGR2GRAY), res), img_list);
 img_list = map(lambda (f, res): f, img_list);

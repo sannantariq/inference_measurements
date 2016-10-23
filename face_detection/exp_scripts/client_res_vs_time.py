@@ -150,12 +150,51 @@ def generateTaskQueueCopies(task_list):
         input_queue.put((i, map(lambda x: (x, task), range(RUNS))));
     return input_queue;
 
+lt_feat_1 = ('localhost', 50000);
+lt_feat_2 = ('localhost', 50001);
+lt_feat_3 = ('localhost', 50002);
+
+ed1_feat_1 = ('172.20.99.60', 50000);
+ed1_feat_2 = ('172.20.99.60', 50001);
+ed1_feat_3 = ('172.20.99.60', 50002);
+
+ed2_feat_1 = ('172.20.96.110', 50000);
+ed2_feat_2 = ('172.20.96.110', 50001);
+ed2_feat_3 = ('172.20.96.110', 50002);
+
+rpi1_feat_1 = ('86.36.35.76', 50000);
+rpi1_feat_2 = ('86.36.35.76', 50001);
+rpi1_feat_3 = ('86.36.35.76', 50002);
+
+rpi2_feat_1 = ('86.36.34.250', 50000);
+rpi2_feat_2 = ('86.36.34.250', 50001);
+rpi2_feat_3 = ('86.36.34.250', 50002);
+
+experiments = {
+'exp1': ('res-V-time_ED-1_feat-1.txt', [ed1_feat_1]),
+'exp2': ('res-V-time_ED-1_feat-2.txt', [ed1_feat_2]),
+'exp3': ('res-V-time_ED-1_feat-3.txt', [ed1_feat_3]),
+'exp4': ('res-V-time_ED-2_feat-1.txt', [ed1_feat_1, ed2_feat_1]),
+'exp5': ('res-V-time_ED-2_feat-2.txt', [ed1_feat_2, ed2_feat_2]),
+'exp6': ('res-V-time_ED-2_feat-3.txt', [ed1_feat_3, ed2_feat_3]),
+'exp7': ('res-V-time_PI-1_feat-1.txt', [rpi1_feat_1]),
+'exp8': ('res-V-time_PI-1_feat-2.txt', [rpi1_feat_1]),
+'exp9': ('res-V-time_PI-1_feat-3.txt', [rpi1_feat_1]),
+'exp10': ('res-V-time_PI-2_feat-1.txt', [rpi1_feat_1, rpi2_feat_1]),
+'exp11': ('res-V-time_PI-2_feat-2.txt', [rpi1_feat_2, rpi2_feat_2]),
+'exp12': ('res-V-time_PI-2_feat-3.txt', [rpi1_feat_3, rpi2_feat_3]),
+'exp0': ('res-V-time_LT-1_feat-1.txt', [lt_feat_1]),
+'exp13': ('res-V-time_LT-1_feat-2.txt', [lt_feat_2]),
+'exp14': ('res-V-time_LT-1_feat-3.txt', [lt_feat_3])
+}
+
 """
 Experiment Configuration
 """
+
 IMAGE_DIR = "../../../face_examples/resolution/";
 OUPUT_DIR = "../raw_data/";
-EXP = "test-res-V-time_ED-1_feat-3.txt";
+EXP, service_list = experiments[sys.argv[1]];
 RUNS = 1;
 
 
@@ -169,14 +208,15 @@ results = {};
 # service_list = [('localhost', 50000), ('localhost', 50001)];
 # service_list = [('localhost', 50000)];
 # service_list = [('172.20.96.110', 50000)];
-service_list = [('172.20.99.60', 50000)];
+# service_list = [('172.20.99.60', 50000)];
+# service_list = [('172.20.99.60', 50000), ()]
 
 
 """
 Actual Experiment
 """
 
-init_img_list = load_images();
+init_img_list = load_images()[:2];
 img_list = map(lambda (f, res): (cv2.imread("%s%s" % (IMAGE_DIR, f)), res), init_img_list);
 img_list = map(lambda (f, res): (cv2.cvtColor(f, cv2.COLOR_BGR2GRAY), res), img_list);
 img_list = map(lambda (f, res): f, img_list);

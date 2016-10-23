@@ -61,9 +61,9 @@ def load_images():
     img_list = [];
     dirs = os.listdir(IMAGE_DIR);
     img_list = filter(lambda x: 'face-' in x, dirs);
-    img_list = map(lambda x: (x, os.path.getsize("%s/%s" % (IMAGE_DIR, x))), img_list);
-    # img_list = map(lambda x: (x, x.split('-')[1].split('.')[0].split('x')), img_list);
-    # img_list = map(lambda (x, y): (x, (int(y[0]), int(y[1]))), img_list);
+    # img_list = map(lambda x: (x, os.path.getsize("%s/%s" % (IMAGE_DIR, x))), img_list);
+    img_list = map(lambda x: (x, x.split('-')[1].split('.')[0].split('x')), img_list);
+    img_list = map(lambda (x, y): (x, int(y[0]) * int(y[1])), img_list);
     img_list.sort(key = get_key);
     return img_list;
 
@@ -171,13 +171,50 @@ def generateTaskQueueCopies(task_list):
         input_queue.put((i, map(lambda x: (x, task), range(RUNS))));
     return input_queue;
 
+lt_feat_1 = ('localhost', 50000);
+lt_feat_2 = ('localhost', 50001);
+lt_feat_3 = ('localhost', 50002);
+
+ed1_feat_1 = ('172.20.99.60', 50000);
+ed1_feat_2 = ('172.20.99.60', 50001);
+ed1_feat_3 = ('172.20.99.60', 50002);
+
+ed2_feat_1 = ('172.20.96.110', 50000);
+ed2_feat_2 = ('172.20.96.110', 50001);
+ed2_feat_3 = ('172.20.96.110', 50002);
+
+rpi1_feat_1 = ('86.36.35.76', 50000);
+rpi1_feat_2 = ('86.36.35.76', 50001);
+rpi1_feat_3 = ('86.36.35.76', 50002);
+
+rpi2_feat_1 = ('86.36.34.250', 50000);
+rpi2_feat_2 = ('86.36.34.250', 50001);
+rpi2_feat_3 = ('86.36.34.250', 50002);
+
+experiments = {
+'exp1': ('faces-V-time_ED-1_feat-1.txt', [ed1_feat_1]),
+'exp2': ('faces-V-time_ED-1_feat-2.txt', [ed1_feat_2]),
+'exp3': ('faces-V-time_ED-1_feat-3.txt', [ed1_feat_3]),
+'exp4': ('faces-V-time_ED-2_feat-1.txt', [ed1_feat_1, ed2_feat_1]),
+'exp5': ('faces-V-time_ED-2_feat-2.txt', [ed1_feat_2, ed2_feat_2]),
+'exp6': ('faces-V-time_ED-2_feat-3.txt', [ed1_feat_3, ed2_feat_3]),
+'exp7': ('faces-V-time_PI-1_feat-1.txt', [rpi1_feat_1]),
+'exp8': ('faces-V-time_PI-1_feat-2.txt', [rpi1_feat_2]),
+'exp9': ('faces-V-time_PI-1_feat-3.txt', [rpi1_feat_3]),
+'exp10': ('faces-V-time_PI-2_feat-1.txt', [rpi1_feat_1, rpi2_feat_1]),
+'exp11': ('faces-V-time_PI-2_feat-2.txt', [rpi1_feat_2, rpi2_feat_2]),
+'exp12': ('faces-V-time_PI-2_feat-3.txt', [rpi1_feat_3, rpi2_feat_3]),
+'exp0': ('faces-V-time_LT-1_feat-1.txt', [lt_feat_1]),
+'exp13': ('faces-V-time_LT-1_feat-2.txt', [lt_feat_2]),
+'exp14': ('faces-V-time_LT-1_feat-3.txt', [lt_feat_3])
+}
 """
 Experiment Configuration
 """
 IMAGE_DIR = "../../../face_examples/faces/";
 OUPUT_DIR = "../raw_data/";
-EXP = "FacesVsTime-LT-1.txt";
-RUNS = 5;
+EXP, service_list = experiments[sys.argv[1]];
+RUNS = 1;
 
 
 
@@ -187,7 +224,7 @@ Initialization of the experiment
 """
 outfile = "%s%s" % (OUPUT_DIR, EXP);
 results = {};
-service_list = [('localhost', 50000), ('localhost', 50001)];
+# service_list = [('localhost', 50000), ('localhost', 50001)];
 # service_list = [('172.20.99.60', 50000)];
 
 
@@ -200,9 +237,9 @@ init_img_list = load_images();
 img_list = map(lambda (f, res): (cv2.imread("%s%s" % (IMAGE_DIR, f)), res), init_img_list);
 img_list = map(lambda (f, res): (cv2.cvtColor(f, cv2.COLOR_BGR2GRAY), res), img_list);
 img_list = map(lambda (f, res): f, img_list);
-for i in img_list:
-	print i.shape;
-sys.exit()
+# for i in img_list:
+# 	print i.shape;
+# sys.exit()
 
 # input_queue = generateTaskQueueSplits(img_list, service_list);
 input_queue = generateTaskQueueSplits(img_list, service_list);
@@ -235,7 +272,9 @@ final = enumerate(map(lambda (_, s): s, init_img_list));
 final = map(lambda (i, size): (size, (results[i][0], results[i][1])), final);
 print final
 
-
+with open(outfile, 'w') as f:
+    for (s, (o, p)) in final:
+        f.write("%s\t%s\t%s\n" % (s, o , p))
 # print input_queue.qsize();
 # while not input_queue.empty():
 #     print input_queue.get()
