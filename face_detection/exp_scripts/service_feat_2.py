@@ -53,6 +53,7 @@ class mysocket:
 
 
 def process_data(data, feat_list):
+    print "processing";
     start_time = time.time()
     res = {};
     matrix = pickle.loads(data);
