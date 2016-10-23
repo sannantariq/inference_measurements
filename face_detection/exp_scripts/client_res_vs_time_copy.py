@@ -155,7 +155,7 @@ Experiment Configuration
 """
 IMAGE_DIR = "../../../face_examples/resolution/";
 OUPUT_DIR = "../raw_data/";
-EXP = "res-V-time_ED-1_feat-2.txt";
+EXP = "res-V-time_ED-1_feat-3.txt";
 RUNS = 1;
 
 
@@ -168,7 +168,7 @@ outfile = "%s%s" % (OUPUT_DIR, EXP);
 results = {};
 # service_list = [('localhost', 50000), ('localhost', 50001)];
 # service_list = [('localhost', 50000)];
-service_list = [('172.20.96.110', 50000)];
+service_list = [('172.20.96.110', 50001)];
 
 
 
