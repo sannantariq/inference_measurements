@@ -100,15 +100,16 @@ input = [server,sys.stdin]
 # cascade_list.append(cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_mcs_nose.xml'));
 # cascade_list.append(cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_smile.xml'));
 
-cascade_dict = {'face': cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_frontalface_default.xml'),
-                'eye_right': cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_mcs_righteyexml'),
-                'eye_left': cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_mcs_lefteye.xml'),
-                'ear_right': cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_mcs_rightear.xml'),
-                'ear_left': cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_mcs_leftear.xml'),
-                'nose': cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_mcs_nose.xml'),
-                'mouth': cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_mcs_mouth.xml'),
-                'smile': cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_smile.xml')
+cascade_dict = {'face': cv2.CascadeClassifier('../../cascades/haarcascades/haarcascade_frontalface_default.xml'),
+                'eye_right': cv2.CascadeClassifier('../../cascades/haarcascades/haarcascade_mcs_righteyexml'),
+                'eye_left': cv2.CascadeClassifier('../../cascades/haarcascades/haarcascade_mcs_lefteye.xml'),
+                'ear_right': cv2.CascadeClassifier('../../cascades/haarcascades/haarcascade_mcs_rightear.xml'),
+                'ear_left': cv2.CascadeClassifier('../../cascades/haarcascades/haarcascade_mcs_leftear.xml'),
+                'nose': cv2.CascadeClassifier('../../cascades/haarcascades/haarcascade_mcs_nose.xml'),
+                'mouth': cv2.CascadeClassifier('../../cascades/haarcascades/haarcascade_mcs_mouth.xml'),
+                'smile': cv2.CascadeClassifier('../../cascades/haarcascades/haarcascade_smile.xml')
                 }
+
 
 # feat_list = ['face', 'nose', 'eye_left', 'eye_right'];
 feat_list_1 = ['face'];
