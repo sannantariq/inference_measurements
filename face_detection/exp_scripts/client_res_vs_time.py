@@ -185,7 +185,10 @@ experiments = {
 'exp12': ('res-V-time_PI-2_feat-3.txt', [rpi1_feat_3, rpi2_feat_3]),
 'exp0': ('res-V-time_LT-1_feat-1.txt', [lt_feat_1]),
 'exp13': ('res-V-time_LT-1_feat-2.txt', [lt_feat_2]),
-'exp14': ('res-V-time_LT-1_feat-3.txt', [lt_feat_3])
+'exp14': ('res-V-time_LT-1_feat-3.txt', [lt_feat_3]),
+'exp15': ('res-V-time_PI-2_ED-2_feat-1.txt', [rpi1_feat_1, rpi2_feat_1, ed1_feat_1, ed2_feat_1]),
+'exp16': ('res-V-time_PI-2_ED-2_feat-2.txt', [rpi1_feat_2, rpi2_feat_2, ed1_feat_2, ed2_feat_2]),
+'exp17': ('res-V-time_PI-2_ED-2_feat-3.txt', [rpi1_feat_3, rpi2_feat_3, ed1_feat_3, ed2_feat_3])
 }
 
 """
@@ -195,7 +198,7 @@ Experiment Configuration
 IMAGE_DIR = "../../../face_examples/resolution/";
 OUPUT_DIR = "../raw_data/";
 EXP, service_list = experiments[sys.argv[1]];
-RUNS = 1;
+RUNS = 4;
 
 
 
@@ -216,7 +219,7 @@ results = {};
 Actual Experiment
 """
 
-init_img_list = load_images()[:2];
+init_img_list = load_images();
 img_list = map(lambda (f, res): (cv2.imread("%s%s" % (IMAGE_DIR, f)), res), init_img_list);
 img_list = map(lambda (f, res): (cv2.cvtColor(f, cv2.COLOR_BGR2GRAY), res), img_list);
 img_list = map(lambda (f, res): f, img_list);

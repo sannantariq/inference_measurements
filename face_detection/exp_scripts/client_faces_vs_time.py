@@ -206,7 +206,10 @@ experiments = {
 'exp12': ('faces-V-time_PI-2_feat-3.txt', [rpi1_feat_3, rpi2_feat_3]),
 'exp0': ('faces-V-time_LT-1_feat-1.txt', [lt_feat_1]),
 'exp13': ('faces-V-time_LT-1_feat-2.txt', [lt_feat_2]),
-'exp14': ('faces-V-time_LT-1_feat-3.txt', [lt_feat_3])
+'exp14': ('faces-V-time_LT-1_feat-3.txt', [lt_feat_3]),
+'exp15': ('faces-V-time_PI-2_ED-2_feat-1.txt', [rpi1_feat_1, rpi2_feat_1, ed1_feat_1, ed2_feat_1]),
+'exp16': ('faces-V-time_PI-2_ED-2_feat-2.txt', [rpi1_feat_2, rpi2_feat_2, ed1_feat_2, ed2_feat_2]),
+'exp17': ('faces-V-time_PI-2_ED-2_feat-3.txt', [rpi1_feat_3, rpi2_feat_3, ed1_feat_3, ed2_feat_3])
 }
 """
 Experiment Configuration
