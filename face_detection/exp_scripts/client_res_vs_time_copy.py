@@ -76,6 +76,7 @@ def worker_thread(input_queue, service_socket):
       response, process_time = pickle.loads(mysocket(service_socket).myreceive());
       local_dict[i] = (time.time() - start_time, process_time);
       input_queue.task_done();
+      # print i, local_dict
         
 def main():
     parser = argparse.ArgumentParser();
@@ -150,29 +151,20 @@ def generateTaskQueueCopies(task_list):
         input_queue.put((i, map(lambda x: (x, task), range(RUNS))));
     return input_queue;
 
-"""
-Experiment Configuration
-"""
-IMAGE_DIR = "../../../face_examples/resolution/";
-OUPUT_DIR = "../raw_data/";
-EXP = "test3-res-V-time_ED-1_feat-1.txt";
-RUNS = 1;
+def generateQueues(task_list):
+    input_queue = Queue.Queue();
+    for (i, task) in enumerate(task_list):
+        iQueue = Queue.Queue();
+        for _ in range(RUNS):
+            iQueue.put(task);
+        input_queue.put((i, iQueue));
+    return input_queue;
 
 
-
-
-"""
-Initialization of the experiment
-"""
-outfile = "%s%s" % (OUPUT_DIR, EXP);
-results = {};
-# service_list = [('localhost', 50000), ('localhost', 50001)];
-# service_list = [('localhost', 50000)];
-# service_list = [('172.20.96.110', 50000)];
-# service_list = [('172.20.99.60', 50000)];
-# service_list = [('172.20.99.60', 50000), ()]
 
 lt_feat_1 = ('localhost', 50000);
+lt_feat_11 = ('localhost', 50004);
+lt_feat_111 = ('localhost', 50005);
 lt_feat_2 = ('localhost', 50001);
 lt_feat_3 = ('localhost', 50002);
 
@@ -184,24 +176,82 @@ ed2_feat_1 = ('172.20.96.110', 50000);
 ed2_feat_2 = ('172.20.96.110', 50001);
 ed2_feat_3 = ('172.20.96.110', 50002);
 
-rpi1_feat_1 = ('172.20.96.110', 50000);
-rpi1_feat_2 = ('172.20.96.110', 50001);
-rpi1_feat_3 = ('172.20.96.110', 50002);
-rpi2_feat_1 = ('172.20.96.110', 50000);
-rpi2_feat_2 = ('172.20.96.110', 50001);
-rpi2_feat_3 = ('172.20.96.110', 50002);
+rpi1_feat_1 = ('86.36.35.76', 50000);
+rpi1_feat_2 = ('86.36.35.76', 50001);
+rpi1_feat_3 = ('86.36.35.76', 50002);
 
-service_list = [ed2_feat_1, ed2_feat_2];
+rpi2_feat_1 = ('86.36.34.250', 50000);
+rpi2_feat_2 = ('86.36.34.250', 50001);
+rpi2_feat_3 = ('86.36.34.250', 50002);
+
+rpiDock_feat_1 = ('172.20.64.13', 8080);
+rpiDock2_feat_1 = ('172.20.64.223', 8080);
+
+
+experiments = {
+'exp1': ('res-V-time_ED-1_feat-1.txt', [ed1_feat_1]),
+'exp2': ('res-V-time_ED-1_feat-2.txt', [ed1_feat_2]),
+'exp3': ('res-V-time_ED-1_feat-3.txt', [ed1_feat_3]),
+'exp4': ('res-V-time_ED-2_feat-1.txt', [ed1_feat_1, ed2_feat_1]),
+'exp5': ('res-V-time_ED-2_feat-2.txt', [ed1_feat_2, ed2_feat_2]),
+'exp6': ('res-V-time_ED-2_feat-3.txt', [ed1_feat_3, ed2_feat_3]),
+'exp7': ('res-V-time_PI-1_feat-1.txt', [rpi1_feat_1]),
+'exp8': ('res-V-time_PI-1_feat-2.txt', [rpi1_feat_1]),
+'exp9': ('res-V-time_PI-1_feat-3.txt', [rpi1_feat_1]),
+'exp10': ('res-V-time_PI-2_feat-1.txt', [rpi1_feat_1, rpi2_feat_1]),
+'exp11': ('res-V-time_PI-2_feat-2.txt', [rpi1_feat_2, rpi2_feat_2]),
+'exp12': ('res-V-time_PI-2_feat-3.txt', [rpi1_feat_3, rpi2_feat_3]),
+'exp0': ('res-V-time_LT-1_feat-1.txt', [lt_feat_1]),
+'exp13': ('res-V-time_LT-1_feat-2.txt', [lt_feat_2]),
+'exp14': ('res-V-time_LT-1_feat-3.txt', [lt_feat_3]),
+'exp15': ('res-V-time_PI-2_ED-2_feat-1.txt', [rpi1_feat_1, rpi2_feat_1, ed1_feat_1, ed2_feat_1]),
+'exp16': ('res-V-time_PI-2_ED-2_feat-2.txt', [rpi1_feat_2, rpi2_feat_2, ed1_feat_2, ed2_feat_2]),
+'exp17': ('res-V-time_PI-2_ED-2_feat-3.txt', [rpi1_feat_3, rpi2_feat_3, ed1_feat_3, ed2_feat_3]),
+'exp18': ('res-V-time_PIDocker-1_feat-1.txt', [rpiDock_feat_1]),
+'exp19': ('res-V-time_PIDocker-2_feat-1.txt', [rpiDock_feat_1, rpiDock2_feat_1]),
+'exp001' : ('test_output.txt', [lt_feat_1]),
+'exp002' : ('test_output.txt', [lt_feat_1, lt_feat_11]),
+'exp003' : ('test_output.txt', [lt_feat_1, lt_feat_11, lt_feat_111]),
+}
+
+"""
+Experiment Configuration
+"""
+
+IMAGE_DIR = "../../../face_examples/resolution/";
+OUPUT_DIR = "../raw_data/";
+EXP, service_list = experiments[sys.argv[1]];
+# EXP, service_list = ('test_output.txt', [lt_feat_1, lt_feat_11, lt_feat_111])
+RUNS = 4;
+
+
+
+
+# """
+# Initialization of the experiment
+# """
+outfile = "%s%s" % (OUPUT_DIR, EXP);
+results = {};
+# service_list = [('localhost', 50000), ('localhost', 50001)];
+# service_list = [('localhost', 50000)];
+# service_list = [('172.20.96.110', 50000)];
+# service_list = [('172.20.99.60', 50000)];
+# service_list = [('172.20.99.60', 50000), ()]
+
+
 """
 Actual Experiment
 """
 
-init_img_list = load_images()[:2];
+# IMAGE_DIR = "../../../face_examples/resolution/";
+init_img_list = load_images()[:5];
 img_list = map(lambda (f, res): (cv2.imread("%s%s" % (IMAGE_DIR, f)), res), init_img_list);
 img_list = map(lambda (f, res): (cv2.cvtColor(f, cv2.COLOR_BGR2GRAY), res), img_list);
 img_list = map(lambda (f, res): f, img_list);
 
 # input_queue = generateTaskQueueSplits(img_list, service_list);
+# print img_list
+# sys.exit()
 input_queue = generateTaskQueueCopies(img_list);
 
 
@@ -218,14 +268,22 @@ worker_threads = map(lambda s: Thread(target = worker_thread, args = (task_queue
 map(lambda x: x.setDaemon(True), worker_threads);
 map(lambda x: x.start(), worker_threads);
 
+
 while not input_queue.empty():
     (i, task_list) = input_queue.get();
     map(lambda x: task_queue.put(x), task_list);
     local_dict = initLocalDict();
+    overall_time = time.time()
     can_run = True;
     task_queue.join();
+    overall_time = time.time() - overall_time;
     can_run = False;
-    results[i] = processResults(local_dict.values());
+    # results[i] = processResults(local_dict.values());
+    # print i, overall_time, overall_time/RUNS
+    results[i] = (overall_time, overall_time/RUNS)
+
+# print results
+# sys.exit()
 
 final = enumerate(map(lambda (_, s): s, init_img_list));
 final = map(lambda (i, size): (size, (results[i][0], results[i][1])), final);

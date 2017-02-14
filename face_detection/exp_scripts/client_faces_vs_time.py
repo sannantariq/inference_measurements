@@ -80,12 +80,12 @@ def worker_thread(input_queue, service_socket):
 			start_time = time.time();
 			mysocket(service_socket).mysend(pickle.dumps(task));
 			response, process_time = pickle.loads(mysocket(service_socket).myreceive());
-			overall_time = time.time() - start_time;
-			prev_overall_time, prev_process_time = local_dict[i];
-			if prev_process_time < 0 and prev_overall_time < 0:
-				local_dict[i] = (overall_time, process_time);
-			else:
-				local_dict[i] = (overall_time + prev_overall_time, process_time + prev_process_time);
+			# overall_time = time.time() - start_time;
+			# prev_overall_time, prev_process_time = local_dict[i];
+			# if prev_process_time < 0 and prev_overall_time < 0:
+			# 	local_dict[i] = (overall_time, process_time);
+			# else:
+			# 	local_dict[i] = (overall_time + prev_overall_time, process_time + prev_process_time);
 				# local_dict[i] = (time.time() - start_time, process_time);
 			input_queue.task_done();
 		
@@ -172,6 +172,8 @@ def generateTaskQueueCopies(task_list):
     return input_queue;
 
 lt_feat_1 = ('localhost', 50000);
+lt_feat_11 = ('localhost', 50004);
+lt_feat_111 = ('localhost', 50005);
 lt_feat_2 = ('localhost', 50001);
 lt_feat_3 = ('localhost', 50002);
 
@@ -209,7 +211,10 @@ experiments = {
 'exp14': ('faces-V-time_LT-1_feat-3.txt', [lt_feat_3]),
 'exp15': ('faces-V-time_PI-2_ED-2_feat-1.txt', [rpi1_feat_1, rpi2_feat_1, ed1_feat_1, ed2_feat_1]),
 'exp16': ('faces-V-time_PI-2_ED-2_feat-2.txt', [rpi1_feat_2, rpi2_feat_2, ed1_feat_2, ed2_feat_2]),
-'exp17': ('faces-V-time_PI-2_ED-2_feat-3.txt', [rpi1_feat_3, rpi2_feat_3, ed1_feat_3, ed2_feat_3])
+'exp17': ('faces-V-time_PI-2_ED-2_feat-3.txt', [rpi1_feat_3, rpi2_feat_3, ed1_feat_3, ed2_feat_3]),
+'exp001' : ('test_output.txt', [lt_feat_1]),
+'exp002' : ('test_output.txt', [lt_feat_1, lt_feat_11]),
+'exp003' : ('test_output.txt', [lt_feat_1, lt_feat_11, lt_feat_111]),
 }
 """
 Experiment Configuration
@@ -266,10 +271,15 @@ while not input_queue.empty():
     (i, task_list) = input_queue.get();
     map(lambda x: task_queue.put(x), task_list);
     local_dict = initLocalDict();
+    overall_time = time.time();
     can_run = True;
     task_queue.join();
+    overall_time = time.time() - overall_time;
     can_run = False;
-    results[i] = processResults(local_dict.values());
+    # results[i] = processResults(local_dict.values());
+    print i, overall_time, overall_time/RUNS
+
+sys.exit()
 
 final = enumerate(map(lambda (_, s): s, init_img_list));
 final = map(lambda (i, size): (size, (results[i][0], results[i][1])), final);
