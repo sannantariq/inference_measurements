@@ -197,8 +197,8 @@ experiments = {
 'exp5': ('res-V-time_ED-2_feat-2.txt', [ed1_feat_2, ed2_feat_2]),
 'exp6': ('res-V-time_ED-2_feat-3.txt', [ed1_feat_3, ed2_feat_3]),
 'exp7': ('res-V-time_PI-1_feat-1.txt', [rpi1_feat_1]),
-'exp8': ('res-V-time_PI-1_feat-2.txt', [rpi1_feat_1]),
-'exp9': ('res-V-time_PI-1_feat-3.txt', [rpi1_feat_1]),
+'exp8': ('res-V-time_PI-1_feat-2.txt', [rpi1_feat_2]),
+'exp9': ('res-V-time_PI-1_feat-3.txt', [rpi1_feat_3]),
 'exp10': ('res-V-time_PI-2_feat-1.txt', [rpi1_feat_1, rpi2_feat_1]),
 'exp11': ('res-V-time_PI-2_feat-2.txt', [rpi1_feat_2, rpi2_feat_2]),
 'exp12': ('res-V-time_PI-2_feat-3.txt', [rpi1_feat_3, rpi2_feat_3]),
@@ -223,7 +223,7 @@ IMAGE_DIR = "../../../face_examples/resolution/";
 OUPUT_DIR = "../raw_data/";
 EXP, service_list = experiments[sys.argv[1]];
 # EXP, service_list = ('test_output.txt', [lt_feat_1, lt_feat_11, lt_feat_111])
-RUNS = 4;
+RUNS = 2;
 
 
 

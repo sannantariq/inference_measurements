@@ -280,13 +280,13 @@ while not input_queue.empty():
     overall_time = time.time() - overall_time;
     can_run = False;
     # results[i] = processResults(local_dict.values());
-    print i, overall_time, overall_time/RUNS
+    results[i] = (overall_time, overall_time/RUNS)
 
-sys.exit()
+# sys.exit()
 
 final = enumerate(map(lambda (_, s): s, init_img_list));
 final = map(lambda (i, size): (size, (results[i][0], results[i][1])), final);
-print final
+# print final
 
 with open(outfile, 'w') as f:
     for (s, (o, p)) in final:
