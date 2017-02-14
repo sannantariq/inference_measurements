@@ -171,6 +171,9 @@ def generateTaskQueueCopies(task_list):
         input_queue.put((i, map(lambda x: (x, task), range(RUNS))));
     return input_queue;
 
+rpi1_ip = '172.20.64.180'
+rpi2_ip = '172.20.64.110'
+
 lt_feat_1 = ('localhost', 50000);
 lt_feat_11 = ('localhost', 50004);
 lt_feat_111 = ('localhost', 50005);
@@ -185,13 +188,13 @@ ed2_feat_1 = ('172.20.96.110', 50000);
 ed2_feat_2 = ('172.20.96.110', 50001);
 ed2_feat_3 = ('172.20.96.110', 50002);
 
-rpi1_feat_1 = ('86.36.35.76', 50000);
-rpi1_feat_2 = ('86.36.35.76', 50001);
-rpi1_feat_3 = ('86.36.35.76', 50002);
+rpi1_feat_1 = (rpi1_ip, 50000);
+rpi1_feat_2 = (rpi1_ip, 50001);
+rpi1_feat_3 = (rpi1_ip, 50002);
 
-rpi2_feat_1 = ('86.36.34.250', 50000);
-rpi2_feat_2 = ('86.36.34.250', 50001);
-rpi2_feat_3 = ('86.36.34.250', 50002);
+rpi2_feat_1 = (rpi2_ip, 50000);
+rpi2_feat_2 = (rpi2_ip, 50001);
+rpi2_feat_3 = (rpi2_ip, 50002);
 
 experiments = {
 'exp1': ('faces-V-time_ED-1_feat-1.txt', [ed1_feat_1]),
