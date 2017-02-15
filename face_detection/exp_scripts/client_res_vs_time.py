@@ -185,7 +185,8 @@ rpi2_feat_1 = (rpi2_ip, 50000);
 rpi2_feat_2 = (rpi2_ip, 50001);
 rpi2_feat_3 = (rpi2_ip, 50002);
 
-rpiDock_feat_1 = ('172.20.64.13', 8080);
+rpiDock_feat_1 = ('172.20.64.110', 50000);
+
 rpiDock2_feat_1 = ('172.20.64.223', 8080);
 
 
@@ -213,6 +214,12 @@ experiments = {
 'exp001' : ('test_output.txt', [lt_feat_1]),
 'exp002' : ('test_output.txt', [lt_feat_1, lt_feat_11]),
 'exp003' : ('test_output.txt', [lt_feat_1, lt_feat_11, lt_feat_111]),
+'exp20': ('res-V-time_PIDocker-1_feat-1.txt', [rpi1_feat_1]),
+'exp21': ('res-V-time_PIDocker-1_feat-2.txt', [rpi1_feat_2]),
+'exp22': ('res-V-time_PIDocker-1_feat-3.txt', [rpi1_feat_3]),
+'exp23': ('res-V-time_PIDocker-2_feat-1.txt', [rpi1_feat_1, rpi2_feat_1]),
+'exp24': ('res-V-time_PIDocker-2_feat-2.txt', [rpi1_feat_2, rpi2_feat_2]),
+'exp25': ('res-V-time_PIDocker-2_feat-3.txt', [rpi1_feat_3, rpi2_feat_3]),
 }
 
 """

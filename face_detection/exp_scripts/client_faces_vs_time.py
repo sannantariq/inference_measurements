@@ -218,6 +218,12 @@ experiments = {
 'exp001' : ('test_output.txt', [lt_feat_1]),
 'exp002' : ('test_output.txt', [lt_feat_1, lt_feat_11]),
 'exp003' : ('test_output.txt', [lt_feat_1, lt_feat_11, lt_feat_111]),
+'exp20': ('faces-V-time_PIDocker-1_feat-1.txt', [rpi1_feat_1]),
+'exp21': ('faces-V-time_PIDocker-1_feat-2.txt', [rpi1_feat_2]),
+'exp22': ('faces-V-time_PIDocker-1_feat-3.txt', [rpi1_feat_3]),
+'exp23': ('faces-V-time_PIDocker-2_feat-1.txt', [rpi1_feat_1, rpi2_feat_1]),
+'exp24': ('faces-V-time_PIDocker-2_feat-2.txt', [rpi1_feat_2, rpi2_feat_2]),
+'exp25': ('faces-V-time_PIDocker-2_feat-3.txt', [rpi1_feat_3, rpi2_feat_3]),
 }
 """
 Experiment Configuration
