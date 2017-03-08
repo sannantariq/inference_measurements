@@ -71,10 +71,10 @@ def worker_thread(input_queue, service_socket):
    while True:
     if can_run and not input_queue.empty():
       (i, task) = input_queue.get();
-      # start_time = time.time();
+      start_time = time.time();
       mysocket(service_socket).mysend(pickle.dumps(task));
       response, process_time = pickle.loads(mysocket(service_socket).myreceive());
-      # local_dict[i] = (time.time() - start_time, process_time);
+      local_dict[i] = (time.time() - start_time, process_time);
       input_queue.task_done();
       # print i, local_dict
         
@@ -161,7 +161,10 @@ def generateQueues(task_list):
     return input_queue;
 
 rpi1_ip = '172.20.64.180'
-rpi2_ip = '172.20.64.110'
+rpi2_ip = '172.20.64.55'
+
+
+kb_ip = '10.108.225.170'
 
 lt_feat_1 = ('localhost', 50000);
 lt_feat_11 = ('localhost', 50004);
@@ -188,6 +191,10 @@ rpi2_feat_3 = (rpi2_ip, 50002);
 rpiDock_feat_1 = ('172.20.64.110', 50000);
 
 rpiDock2_feat_1 = ('172.20.64.223', 8080);
+
+rpiKb_feat_1 = (rpi2_ip, 31307)
+rpiKb_feat_2 = (rpi2_ip, 31351)
+rpiKb_feat_3 = (rpi2_ip, 30135)
 
 
 experiments = {
@@ -220,6 +227,10 @@ experiments = {
 'exp23': ('res-V-time_PIDocker-2_feat-1.txt', [rpi1_feat_1, rpi2_feat_1]),
 'exp24': ('res-V-time_PIDocker-2_feat-2.txt', [rpi1_feat_2, rpi2_feat_2]),
 'exp25': ('res-V-time_PIDocker-2_feat-3.txt', [rpi1_feat_3, rpi2_feat_3]),
+'exp26': ('res-V-time_PIKube-2_feat-1.txt', [rpiKb_feat_1]),
+'exp27': ('res-V-time_PIKube-2_feat-2.txt', [rpiKb_feat_2]),
+'exp28': ('res-V-time_PIKube-2_feat-3.txt', [rpiKb_feat_3]),
+'exp29': ('res-V-time_proc_PIDocker.txt', [rpi2_feat_1]),
 }
 
 """
@@ -230,7 +241,7 @@ IMAGE_DIR = "../../../face_examples/resolution/";
 OUPUT_DIR = "../raw_data/";
 EXP, service_list = experiments[sys.argv[1]];
 # EXP, service_list = ('test_output.txt', [lt_feat_1, lt_feat_11, lt_feat_111])
-RUNS = 2;
+RUNS = 4;
 
 
 
@@ -286,12 +297,14 @@ while not input_queue.empty():
     task_queue.join();
     overall_time = time.time() - overall_time;
     can_run = False;
-    # results[i] = processResults(local_dict.values());
+    results[i] = processResults(local_dict.values());
     # print i, overall_time, overall_time/RUNS
     results[i] = (overall_time, overall_time/RUNS)
 
-# print results
-# sys.exit()
+print results
+print "-"*20
+# print local_dict
+sys.exit()
 
 final = enumerate(map(lambda (_, s): s, init_img_list));
 final = map(lambda (i, size): (size, (results[i][0], results[i][1])), final);

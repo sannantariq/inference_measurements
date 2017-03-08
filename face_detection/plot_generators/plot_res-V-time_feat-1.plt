@@ -10,7 +10,9 @@ plot "../raw_data/output_res-V-time_feat-1.txt" using 1:2 title col with linespo
 	"../raw_data/output_res-V-time_feat-1.txt" using 1:3 title col with linespoints, \
 	"../raw_data/output_res-V-time_feat-1.txt" using 1:4 title col with linespoints, \
 	"../raw_data/output_res-V-time_feat-1.txt" using 1:5 title col with linespoints, \
-	"../raw_data/output_res-V-time_feat-1.txt" using 1:6 title col with linespoints
-set terminal png size 2560,1920 enhanced font 'NimbusSanL-Regu' 14
-set output "../plot_outputs/fig_res-V-time_feat-1.png"
-replot
+	"../raw_data/output_res-V-time_feat-1.txt" using 1:6 title col with linespoints, \
+	"../raw_data/output_res-V-time_feat-1.txt" using 1:7 title col with linespoints, \
+	"../raw_data/output_res-V-time_feat-1.txt" using 1:8 title col with linespoints
+#set terminal png size 2560,1920 enhanced font 'NimbusSanL-Regu' 14
+#set output "../plot_outputs/fig_faces-V-time_feat-3.png"
+#replot

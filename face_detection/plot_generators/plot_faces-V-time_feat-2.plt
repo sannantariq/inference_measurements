@@ -11,6 +11,6 @@ plot "../raw_data/output_faces-V-time_feat-2.txt" using 1:2 title col with lines
 	"../raw_data/output_faces-V-time_feat-2.txt" using 1:4 title col with linespoints, \
 	"../raw_data/output_faces-V-time_feat-2.txt" using 1:5 title col with linespoints, \
 	"../raw_data/output_faces-V-time_feat-2.txt" using 1:6 title col with linespoints
-set terminal png size 640.480 enhanced font 'NimbusSanL-Regu' 14
-set output "../plot_outputs/fig_faces-V-time_feat-2.png"
-replot
+#set terminal png size 2560,1920 enhanced font 'NimbusSanL-Regu' 14
+#set output "../plot_outputs/fig_faces-V-time_feat-3.png"
+#replot

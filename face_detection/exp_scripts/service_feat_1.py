@@ -74,9 +74,28 @@ def process_data(data, feat_list):
 
     return pickle.dumps((res, time.time() - start_time));
 
+if len(sys.argv) < 2:
+    print "Usage: ./service.py <featureSet> [port]"
+    sys.exit();
 
+try:
+    featureSet = int(sys.argv[1]);
+    if featureSet not in [1, 2, 3]:
+        print "<featureSet> must be integer from {1, 2, 3}"
+        sys.exit();
+except ValueError:
+    print "<featureSet> must be integer from {1, 2, 3}"
+    sys.exit();
 
-port = int(sys.argv[1]);
+DEF_PORT = 50000
+if len(sys.argv) > 2:
+    try:
+        port = int(sys.argv[2]);
+    except ValueError:
+        port = DEF_PORT;
+else:
+    port = DEF_PORT;
+
 # print port
 # sys.exit()
 
@@ -89,7 +108,7 @@ server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 # server = mysocket(server);
 server.bind((host,port)) 
 server.listen(backlog) 
-input = [server,sys.stdin]
+input = [server]
 
 # face_cascade = cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_frontalface_default.xml');
 # cascade_list.append(cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_mcs_lefteye.xml'));
@@ -112,13 +131,18 @@ cascade_dict = {'face': cv2.CascadeClassifier('../../cascades/haarcascades/haarc
 
 
 # feat_list = ['face', 'nose', 'eye_left', 'eye_right'];
+
 feat_list_1 = ['face'];
 feat_list_2 = ['face', 'eye_right', 'eye_left', 'ear_right', 'ear_left'];
 feat_list_3 = ['face', 'eye_right', 'eye_left', 'ear_right', 'ear_left', 'nose', 'mouth', 'smile'];
+featureDict = {1 : feat_list_1, 2 : feat_list_2, 3 : feat_list_3};
 
-running = 1 
+current_feat = featureDict[featureSet]
+running = 1
+print "Providing service at port %d for featureSet:" % port, featureSet
+
 while running: 
-    inputready,outputready,exceptready = select.select(input,[],[], 1) 
+    inputready,outputready,exceptready = select.select(input,[],[])
 
     for s in inputready: 
 
@@ -130,15 +154,15 @@ while running:
 
         elif s == sys.stdin: 
             # handle standard input 
-            junk = sys.stdin.readline() 
+            junk = sys.stdin.readline()
             running = 0 
 
         else: 
             # handle all other sockets 
             try:
                 data = mysocket(s).myreceive();
-                if data: 
-                    reply = process_data(data, feat_list_1);
+                if data:
+                    reply = process_data(data, current_feat);
                     # print "Sending reply";
                     # print pickle.loads(reply);
                     mysocket(s).mysend(reply);

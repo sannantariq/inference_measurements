@@ -196,6 +196,10 @@ rpi2_feat_1 = (rpi2_ip, 50000);
 rpi2_feat_2 = (rpi2_ip, 50001);
 rpi2_feat_3 = (rpi2_ip, 50002);
 
+rpiKb_feat_1 = (rpi1_ip, 31307)
+rpiKb_feat_2 = (rpi1_ip, 31307)
+rpiKb_feat_3 = (rpi1_ip, 31307)
+
 experiments = {
 'exp1': ('faces-V-time_ED-1_feat-1.txt', [ed1_feat_1]),
 'exp2': ('faces-V-time_ED-1_feat-2.txt', [ed1_feat_2]),
@@ -224,6 +228,9 @@ experiments = {
 'exp23': ('faces-V-time_PIDocker-2_feat-1.txt', [rpi1_feat_1, rpi2_feat_1]),
 'exp24': ('faces-V-time_PIDocker-2_feat-2.txt', [rpi1_feat_2, rpi2_feat_2]),
 'exp25': ('faces-V-time_PIDocker-2_feat-3.txt', [rpi1_feat_3, rpi2_feat_3]),
+'exp26': ('faces-V-time_PIKube-2_feat-1.txt', [rpiKb_feat_1]),
+'exp27': ('faces-V-time_PIKube-2_feat-2.txt', [rpiKb_feat_2]),
+'exp28': ('faces-V-time_PIKube-2_feat-3.txt', [rpiKb_feat_3]),
 }
 """
 Experiment Configuration
