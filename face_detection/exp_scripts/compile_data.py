@@ -1,44 +1,48 @@
 import os, argparse
 
 class IllegalFileError(Exception):
-	"""docstring for IllegalFileError"""
-	def __init__(self):
-		super(IllegalFileError, self).__init__()
-	def __str__(self):
-		return "File name could not be parsed"
+    """docstring for IllegalFileError"""
+    def __init__(self):
+        super(IllegalFileError, self).__init__()
+    def __str__(self):
+        return "File name could not be parsed"
 
 class ExpFile(object):
-	"""docstring for ExpFile"""
-	def __init__(self, filename):
-		self.meta = filename.split("_");
-		self.filename = filename
-		self.exp_name = self.meta[0];
-		self.translate_dict = {
-		'pi' : 'pi',
-		'ed' : 'edison',
-		'pidocker': 'piDocker',
-		'lt' : 'Laptop',
-		'pikube' : 'piKube'
-		}
-		self.initialize()
-		
+    """docstring for ExpFile"""
+    def __init__(self, filename):
+        self.meta = filename.split("_");
+        self.filename = filename
+        self.exp_name = self.meta[0];
+        self.translate_dict = {
+        'pi' : 'pi',
+        'ed' : 'edison',
+        'pidocker': 'piDocker',
+        'lt' : 'Laptop',
+        'pikube' : 'piKube'
+        }
+        self.initialize()
+        
 
-	def initialize(self):
-		self.features = self.meta[-1][:-4].split('-')[1]
-		self.devices = map(lambda x: x.split('-'), self.meta[1:-1]);
-		self.devices = {self.translate_dict[k.lower()]:v for [k, v] in self.devices}
+    def initialize(self):
+        self.features = self.meta[-1][:-4].split('-')[1]
+        self.devices = map(lambda x: x.split('-'), self.meta[1:-1]);
+        self.devices = {self.translate_dict[k.lower()]:v for [k, v] in self.devices}
 
-	def __str__(self):
-		return "(%s-features:%s | %s)" % (self.exp_name, self.features, repr(self.devices))
+    def __str__(self):
+        return "(%s-features:%s | %s)" % (self.exp_name, self.features, repr(self.devices))
 
-	def parseFile(self):
-	with open(self.filename) as f:
-		raw = f.readlines();
+    def parseFile(self):
+        with open(self.filename) as f:
+            raw = f.readlines();
 
-	raw = map(lambda x: x.strip(), raw)
-	raw = map(lambda x : x.split('\t'), raw)
-	raw = [(x, y) for (x, _, y) in raw]
-	return raw
+        raw = map(lambda x: x.strip(), raw)
+        raw = map(lambda x : x.split('\t'), raw)
+        raw = [(x, y) for (x, _, y) in raw]
+        self.data = raw;
+
+    def deviceString(self):
+        s = '';
+        return ' + '.join(map(lambda (k, v): '%sX%s' % (k, v), self.devices.items()));
 
 def main():
     parser = argparse.ArgumentParser();
@@ -52,45 +56,72 @@ def main():
     server = Communicator(args.port, []);
     server.listen();
 
-def parseFile(filename):
-	with open(filename) as f:
-		raw = f.readlines();
+def parseFile(self, filename):
+    with open(filename) as f:
+        raw = f.readlines();
 
-	raw = map(lambda x: x.strip(), raw)
-	raw = map(lambda x : x.split('\t'), raw)
-	raw = [(x, y) for (x, _, y) in raw]
-	self.data = raw;
+    raw = map(lambda x: x.strip(), raw)
+    raw = map(lambda x : x.split('\t'), raw)
+    raw = [(x, y) for (x, _, y) in raw]
+    return raw;
 
 
-def compile(dir_list, exp_name):
-	dir_list = filter(lambda x: x.exp_name == exp_name, dir_list);
-	map(lambda x: x.parseFile(), dir_list);
-	data = {};
-	for 
+def compile(dir_list, exp_name, features):
+    dir_list = filter(lambda x: x.exp_name == exp_name, dir_list);
+    dir_list = filter(lambda x: x.features == features, dir_list);
+    map(lambda x: x.parseFile(), dir_list);
+    data = {};
+    for e in dir_list:
+        for (x, y) in e.data:
+            prev = data.get(x, []);
+            prev.append((e.deviceString(), y));
+            data[x] = prev;
 
-	# dir_list = map(lambda x: ExpFile(x), dir_list)
+    data = dict(map(lambda (k, v): (k, dict(v)), data.items()));
+    return data;
 
-	# print map(str,dir_list)
+
+def createOutput(data, outfile, x_label):
+    x_axis = data.keys();
+    x_axis.sort();
+
+    y_axis = [];
+    map(lambda x: y_axis.extend(x.keys()), data.values());
+    y_axis = list(set(y_axis));
+    # print y_axis;
+    write_data = [];
+    top_line = [x_label] + y_axis;
+    write_data.append(top_line);
+    for x in x_axis:
+        pre_list = [''] * len(y_axis);
+        for i in range(len(y_axis)):
+            pre_list[i] = data[x].get(y_axis[i], '');
+        write_data.append([x] + pre_list);
+
+    write_data = map(lambda x: ','.join(x) + '\n', write_data);
+    print write_data;
+    with open(outfile, 'w') as f:
+        f.writelines(write_data);
 
 
 PATH = '../raw_data';
 os.chdir(PATH);
 
 dir_list = filter(lambda x: x[-3:] == 'txt', os.listdir('./'));
-print dir_list
+# print dir_list
 # ExpFile('faces-V-time_PI-2_feat-3.txt')e
 # dir_list = map(lambda x: x.split('_'), dir_list)
 exps = []
 for f in dir_list:
-	try:
-		e = ExpFile(f);
-		exps.append(e);
-	except:
-		pass;
+    try:
+        e = ExpFile(f);
+        exps.append(e);
+    except:
+        pass;
 
 # print map(str, exps);
 
 
-# compile(exps, 'res-V-time')
-
-parseFile('faces-V-time_PIDocker-2_feat-3.txt')
+data = compile(exps, 'res-V-time', '1')
+createOutput(data, 'test_output.txt', 'Size(MB)');
+# parseFile('faces-V-time_PIDocker-2_feat-3.txt')
