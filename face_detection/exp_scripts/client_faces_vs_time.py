@@ -171,7 +171,7 @@ def generateTaskQueueCopies(task_list):
         input_queue.put((i, map(lambda x: (x, task), range(RUNS))));
     return input_queue;
 
-rpi1_ip = '172.20.64.180'
+rpi1_ip = '172.20.64.55'
 rpi2_ip = '172.20.64.110'
 
 lt_feat_1 = ('localhost', 50000);
@@ -196,9 +196,9 @@ rpi2_feat_1 = (rpi2_ip, 50000);
 rpi2_feat_2 = (rpi2_ip, 50001);
 rpi2_feat_3 = (rpi2_ip, 50002);
 
-rpiKb_feat_1 = (rpi1_ip, 31307)
-rpiKb_feat_2 = (rpi1_ip, 31307)
-rpiKb_feat_3 = (rpi1_ip, 31307)
+rpiKb_feat_1 = (rpi1_ip, 32503)
+rpiKb_feat_2 = (rpi1_ip, 32745)
+rpiKb_feat_3 = (rpi1_ip, 31425)
 
 experiments = {
 'exp1': ('faces-V-time_ED-1_feat-1.txt', [ed1_feat_1]),
@@ -222,6 +222,7 @@ experiments = {
 'exp001' : ('test_output.txt', [lt_feat_1]),
 'exp002' : ('test_output.txt', [lt_feat_1, lt_feat_11]),
 'exp003' : ('test_output.txt', [lt_feat_1, lt_feat_11, lt_feat_111]),
+'exp004' : ('test_output.txt', [rpi1_feat_1]),
 'exp20': ('faces-V-time_PIDocker-1_feat-1.txt', [rpi1_feat_1]),
 'exp21': ('faces-V-time_PIDocker-1_feat-2.txt', [rpi1_feat_2]),
 'exp22': ('faces-V-time_PIDocker-1_feat-3.txt', [rpi1_feat_3]),

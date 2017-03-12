@@ -160,8 +160,8 @@ def generateQueues(task_list):
         input_queue.put((i, iQueue));
     return input_queue;
 
-rpi1_ip = '172.20.64.180'
-rpi2_ip = '172.20.64.55'
+rpi1_ip = '172.20.64.55'
+rpi2_ip = '172.20.64.180'
 
 
 kb_ip = '10.108.225.170'
@@ -192,9 +192,9 @@ rpiDock_feat_1 = ('172.20.64.110', 50000);
 
 rpiDock2_feat_1 = ('172.20.64.223', 8080);
 
-rpiKb_feat_1 = (rpi2_ip, 31307)
-rpiKb_feat_2 = (rpi2_ip, 31351)
-rpiKb_feat_3 = (rpi2_ip, 30135)
+rpiKb_feat_1 = (rpi1_ip, 32503)
+rpiKb_feat_2 = (rpi1_ip, 32745)
+rpiKb_feat_3 = (rpi1_ip, 31425)
 
 
 experiments = {
@@ -218,7 +218,7 @@ experiments = {
 'exp17': ('res-V-time_PI-2_ED-2_feat-3.txt', [rpi1_feat_3, rpi2_feat_3, ed1_feat_3, ed2_feat_3]),
 'exp18': ('res-V-time_PIDocker-1_feat-1.txt', [rpiDock_feat_1]),
 'exp19': ('res-V-time_PIDocker-2_feat-1.txt', [rpiDock_feat_1, rpiDock2_feat_1]),
-'exp001' : ('test_output.txt', [lt_feat_1]),
+'exp001' : ('test_output.txt', [rpi1_feat_1]),
 'exp002' : ('test_output.txt', [lt_feat_1, lt_feat_11]),
 'exp003' : ('test_output.txt', [lt_feat_1, lt_feat_11, lt_feat_111]),
 'exp20': ('res-V-time_PIDocker-1_feat-1.txt', [rpi1_feat_1]),
@@ -241,7 +241,7 @@ IMAGE_DIR = "../../../face_examples/resolution/";
 OUPUT_DIR = "../raw_data/";
 EXP, service_list = experiments[sys.argv[1]];
 # EXP, service_list = ('test_output.txt', [lt_feat_1, lt_feat_11, lt_feat_111])
-RUNS = 4;
+RUNS = 1;
 
 
 
@@ -299,12 +299,12 @@ while not input_queue.empty():
     can_run = False;
     results[i] = processResults(local_dict.values());
     # print i, overall_time, overall_time/RUNS
-    results[i] = (overall_time, overall_time/RUNS)
+    # results[i] = (overall_time, overall_time/RUNS)
 
-print results
+# print results
 print "-"*20
 # print local_dict
-sys.exit()
+# sys.exit()
 
 final = enumerate(map(lambda (_, s): s, init_img_list));
 final = map(lambda (i, size): (size, (results[i][0], results[i][1])), final);
