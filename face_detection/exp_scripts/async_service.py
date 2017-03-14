@@ -6,7 +6,8 @@ import sys
 import time
 import cv2
 import pickle
-
+import Queue
+from threading import Thread
 class mysocket:
     '''demonstration class only
       - coded for clarity, not efficiency
@@ -19,6 +20,7 @@ class mysocket:
                 socket.AF_INET, socket.SOCK_STREAM)
         else:
             self.sock = sock
+        self.buffer = '';
 
     def connect(self, host, port):
         self.sock.connect((host, port))
@@ -34,21 +36,30 @@ class mysocket:
             totalsent = totalsent + sent
 
     def myreceive(self):
-        # print "Receiving Things..."
-        chunks = []
-        MSG_COMP = -1
-        last_msg = '';
-        while MSG_COMP < 0:
-            chunk = self.sock.recv(self.BUF_SIZE);
-            if chunk == '':
-                raise RuntimeError("socket connection broken")
-            chunks.append(chunk)
-            last_msg = ''.join(chunks[-2:]);
-            # print "New Chunk:%s" % chunk;
-            # print chunks;
-            # print "SERACHING in:%s" % last_msg;
-            MSG_COMP = last_msg.find("\END", max(0, len(last_msg) - len(chunks[-1]) - 10))
-        return ''.join([''.join(chunks[:-2]), last_msg[:MSG_COMP]])
+        print "Receiving Things..."
+        chunk = self.buffer + self.sock.recv(self.BUF_SIZE);
+        # print chunk
+        chunks = chunk.split("\END\n");
+        # print chunks
+        self.buffer = chunks[-1];
+        chunks = chunks[:-1];
+        # print chunks
+        return chunks;
+
+        # chunks = []
+        # MSG_COMP = -1
+        # last_msg = '';
+        # while MSG_COMP < 0:
+        #     chunk = self.sock.recv(self.BUF_SIZE);
+        #     if chunk == '':
+        #         raise RuntimeError("socket connection broken")
+        #     chunks.append(chunk)
+        #     last_msg = ''.join(chunks[-2:]);
+        #     # print "New Chunk:%s" % chunk;
+        #     # print chunks;
+        #     # print "SERACHING in:%s" % last_msg;
+        #     MSG_COMP = last_msg.find("\END", max(0, len(last_msg) - len(chunks[-1]) - 10))
+        # return ''.join([''.join(chunks[:-2]), last_msg[:MSG_COMP]])
         # return ''.join(chunks)
 
 
@@ -74,12 +85,15 @@ def process_data(data, feat_list):
 
     return pickle.dumps((res, time.time() - start_time));
 
-def consume_thread(task_queue, client):
+def consume_thread(task_queue):
     while True:
         if not task_queue.empty():
-            t = task_queue.get();
-            client.send(task_queue);
+            # print "Processing task in thread"
+            data, client = task_queue.get();
+            reply = MY_NAME + " says: " + data;
+            mysocket(client).mysend(pickle.dumps(reply));
             task_queue.task_done();
+            # print "Reply sent";
 
 if len(sys.argv) < 2:
     print "Usage: ./service.py <featureSet> [port]"
@@ -106,6 +120,7 @@ else:
 # print port
 # sys.exit()
 
+MY_NAME = str(socket.getfqdn());
 host = '' 
 # port = 50001
 backlog = 5 
@@ -116,6 +131,11 @@ server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server.bind((host,port)) 
 server.listen(backlog) 
 input = [server]
+
+task_queue = Queue.Queue();
+con_thread = Thread(target = consume_thread, args = (task_queue, ));
+con_thread.setDaemon(True);
+con_thread.start();
 
 # face_cascade = cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_frontalface_default.xml');
 # cascade_list.append(cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_mcs_lefteye.xml'));
@@ -148,9 +168,9 @@ featureDict = {1 : feat_list_1, 2 : feat_list_2, 3 : feat_list_3};
 current_feat = featureDict[featureSet]
 running = 1
 print "Providing service at port %d for featureSet:" % port, featureSet
-
+clients = {};
 while running: 
-    inputready,outputready,exceptready = select.select(input,[],[])
+    inputready,outputready,exceptready = select.select(input,[],[], 0.1)
 
     for s in inputready: 
 
@@ -158,22 +178,30 @@ while running:
             # handle the server socket 
             client, address = server.accept() 
             input.append(client);
+            clients[client] = mysocket(client);
             print "New Client Added";
 
-        elif s == sys.stdin: 
-            # handle standard input 
-            junk = sys.stdin.readline()
-            running = 0 
 
         else: 
             # handle all other sockets 
             try:
-                data = mysocket(s).myreceive();
+                data = clients[s].myreceive();
+                # data = s.recv(100);
+
                 if data:
-                    reply = process_data(data, current_feat);
+                    # reply = process_data(data, current_feat);
                     # print "Sending reply";
                     # print pickle.loads(reply);
-                    mysocket(s).mysend(reply);
+                    # reply = str(socket.getfqdn()) + " says: " + data;
+                    # mysocket(s).mysend(reply);
+                    tasks = map(pickle.loads, data);
+
+                    print "Tasks Received:", tasks
+                    map(lambda t : task_queue.put((t, s)), tasks)
+                    # task_queue.put((data, s));
+                else:
+                    s.close();
+                    input.remove(s);
             except RuntimeError:
                 s.close() 
                 input.remove(s)
