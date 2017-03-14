@@ -103,6 +103,15 @@ if len(sys.argv) > 2:
 else:
     port = DEF_PORT;
 
+PATH_1 = "/data/src/inference_measurements/cascades/haarcascades"
+PATH_2 = "../../cascades/haarcascades/"
+if os.path.exists(PATH_1):
+    PATH = PATH_1;
+elif os.path.exists(PATH_2):
+    PATH = PATH_2;
+else:
+    print "Error: Cascades not found!. Exiting..."
+    sys.exit();
 # print port
 # sys.exit()
 
@@ -125,7 +134,6 @@ input = [server]
 # cascade_list.append(cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_mcs_mouth.xml'));
 # cascade_list.append(cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_mcs_nose.xml'));
 # cascade_list.append(cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_smile.xml'));
-PATH = "/data/src/inference_measurements/cascades/haarcascades"
 
 cascade_dict = {'face': cv2.CascadeClassifier('%s/haarcascade_frontalface_default.xml' % (PATH)),
                 'eye_right': cv2.CascadeClassifier('%s/haarcascade_mcs_righteyexml' % (PATH)),

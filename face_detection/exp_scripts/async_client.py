@@ -41,7 +41,7 @@ class mysocket:
             totalsent = totalsent + sent
 
     def myreceive(self):
-        print "Receiving Things..."
+        # print "Receiving Things..."
         chunk = self.buffer + self.sock.recv(self.BUF_SIZE);
         # print chunk
         chunks = chunk.split("\END\n");
@@ -188,8 +188,13 @@ def recv_thread(out_queue, service_socket, service):
     while True:
         print "Receiveing..."
         response = map(pickle.loads, service.myreceive());
-        print "Response received:", response;
-        map(out_queue.put, response);
+        if len(response) > 0:
+            print "Response received:", response;
+            map(out_queue.put, response);
+        elif service.buffer == '':
+            service_socket.close()
+            break
+        
         # out_queue.put(response);
 
 
@@ -314,8 +319,8 @@ init_img = cv2.cvtColor(init_img, cv2.COLOR_BGR2GRAY);
 out_queue = Queue.Queue();
 img_queue = Queue.Queue();
 for i in range(frame_copies):
-    # img_queue.put(init_img);
-    img_queue.put("Hello World" + str(i))
+    img_queue.put(init_img);
+    # img_queue.put("Hello World" + str(i))
 
 addr = lt_feat_1
 service = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
@@ -328,9 +333,8 @@ worker_threads = {
 map(lambda x: x.setDaemon(True), worker_threads.values());
 map(lambda x: x.start(), worker_threads.values());
 # worker_threads['sender'].start();
-i = 0;
-while out_queue.qsize() <= 10:
-    if out_queue.qsize() == 10:
+while out_queue.qsize() <= frame_copies:
+    if out_queue.qsize() == frame_copies:
         print "All tasks received!"
         break;
 

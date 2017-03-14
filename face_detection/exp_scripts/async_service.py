@@ -7,6 +7,7 @@ import time
 import cv2
 import pickle
 import Queue
+import os
 from threading import Thread
 class mysocket:
     '''demonstration class only
@@ -36,7 +37,7 @@ class mysocket:
             totalsent = totalsent + sent
 
     def myreceive(self):
-        print "Receiving Things..."
+        # print "Receiving Things..."
         chunk = self.buffer + self.sock.recv(self.BUF_SIZE);
         # print chunk
         chunks = chunk.split("\END\n");
@@ -85,12 +86,13 @@ def process_data(data, feat_list):
 
     return pickle.dumps((res, time.time() - start_time));
 
-def consume_thread(task_queue):
+def consume_thread(task_queue, current_feat):
     while True:
         if not task_queue.empty():
-            # print "Processing task in thread"
+            print "Processing task in thread"
             data, client = task_queue.get();
-            reply = MY_NAME + " says: " + data;
+            reply = process_data(data, current_feat)
+            # reply = MY_NAME + " says: " + data;
             mysocket(client).mysend(pickle.dumps(reply));
             task_queue.task_done();
             # print "Reply sent";
@@ -117,6 +119,16 @@ if len(sys.argv) > 2:
 else:
     port = DEF_PORT;
 
+PATH_1 = "/data/src/inference_measurements/cascades/haarcascades"
+PATH_2 = "../../cascades/haarcascades/"
+if os.path.exists(PATH_1):
+    PATH = PATH_1;
+elif os.path.exists(PATH_2):
+    PATH = PATH_2;
+else:
+    print "Error: Cascades not found!. Exiting..."
+    sys.exit();
+
 # print port
 # sys.exit()
 
@@ -132,10 +144,7 @@ server.bind((host,port))
 server.listen(backlog) 
 input = [server]
 
-task_queue = Queue.Queue();
-con_thread = Thread(target = consume_thread, args = (task_queue, ));
-con_thread.setDaemon(True);
-con_thread.start();
+
 
 # face_cascade = cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_frontalface_default.xml');
 # cascade_list.append(cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_mcs_lefteye.xml'));
@@ -145,7 +154,8 @@ con_thread.start();
 # cascade_list.append(cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_mcs_mouth.xml'));
 # cascade_list.append(cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_mcs_nose.xml'));
 # cascade_list.append(cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_smile.xml'));
-PATH = "/data/src/inference_measurements/cascades/haarcascades"
+
+
 
 cascade_dict = {'face': cv2.CascadeClassifier('%s/haarcascade_frontalface_default.xml' % (PATH)),
                 'eye_right': cv2.CascadeClassifier('%s/haarcascade_mcs_righteyexml' % (PATH)),
@@ -166,6 +176,12 @@ feat_list_3 = ['face', 'eye_right', 'eye_left', 'ear_right', 'ear_left', 'nose',
 featureDict = {1 : feat_list_1, 2 : feat_list_2, 3 : feat_list_3};
 
 current_feat = featureDict[featureSet]
+
+task_queue = Queue.Queue();
+con_thread = Thread(target = consume_thread, args = (task_queue, current_feat, ));
+con_thread.setDaemon(True);
+con_thread.start();
+
 running = 1
 print "Providing service at port %d for featureSet:" % port, featureSet
 clients = {};
@@ -188,18 +204,18 @@ while running:
                 data = clients[s].myreceive();
                 # data = s.recv(100);
 
-                if data:
+                if len(data) > 0:
                     # reply = process_data(data, current_feat);
                     # print "Sending reply";
                     # print pickle.loads(reply);
                     # reply = str(socket.getfqdn()) + " says: " + data;
                     # mysocket(s).mysend(reply);
-                    tasks = map(pickle.loads, data);
+                    # tasks = map(pickle.loads, data);
 
-                    print "Tasks Received:", tasks
-                    map(lambda t : task_queue.put((t, s)), tasks)
+                    # print "Tasks Received:", tasks
+                    map(lambda t : task_queue.put((t, s)), data)
                     # task_queue.put((data, s));
-                else:
+                elif clients[s].buffer == '':
                     s.close();
                     input.remove(s);
             except RuntimeError:
