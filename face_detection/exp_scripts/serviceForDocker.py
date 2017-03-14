@@ -6,6 +6,7 @@ import sys
 import time
 import cv2
 import pickle
+import os
 
 class mysocket:
     '''demonstration class only

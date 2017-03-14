@@ -171,30 +171,39 @@ def generateQueues(task_list):
         input_queue.put((i, iQueue));
     return input_queue;
 
-def send_thread(img_queue, service_socket):
+def send_thread(img_queue, service_addr, service_socket):
     while True:
         if not img_queue.empty():
-            # time.sleep(1)
-            # (i, task) = input_queue.get();
-            # start_time = time.time();
-            # print "Sending Task";
-            mysocket(service_socket).mysend(pickle.dumps(img_queue.get()));
-            # service_socket.send(pickle.dumps(img_queue.get()));
-            # response = pickle.loads(mysocket(service_socket).myreceive());
-            # local_dict[i] = (time.time() - start_time, process_time);
-            img_queue.task_done();
 
-def recv_thread(out_queue, service_socket, service):
+            try:
+                mysocket(service_socket).mysend(pickle.dumps(img_queue.get()));
+                img_queue.task_done();
+            except socket.error:
+                service_socket.close();
+                service_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                service_socket.connect(service_addr);
+                # pass
+
+
+def recv_thread(out_queue, service_addr, service_socket, service):
     while True:
         # print "Receiveing..."
-        response = map(pickle.loads, service.myreceive());
-        if len(response) > 0:
-            # print "Response received:", response;
-            map(out_queue.put, response);
-        elif service.buffer == '':
-            service_socket.close()
-            break
-        
+        try:
+            response = map(pickle.loads, service.myreceive());
+            if len(response) > 0:
+                # print "Response received:", response;
+                map(out_queue.put, response);
+            elif service.buffer == '':
+                service_socket.close()
+                break
+        except socket.error:
+            service_socket.close();
+            service_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
+            service_socket.connect(service_addr);
+            service = mysocket(service_socket);
+                # pass
+
+
         # out_queue.put(response);
 
 
@@ -230,13 +239,28 @@ rpiDock_feat_1 = ('172.20.64.110', 50000);
 
 rpiDock2_feat_1 = ('172.20.64.223', 8080);
 
-rpiKb_feat_1 = (rpi1_ip, 32503)
+rpiKb_feat_1 = (rpi1_ip, 31482);
 rpiKb_feat_2 = (rpi1_ip, 32745)
 rpiKb_feat_3 = (rpi1_ip, 31425)
+minikube_feat_1 = ('192.168.99.100', 32584);
 
+"""
+Spec-1: No Messing Around
+Spec-2: Kill container on weaker Pi
+Spec-3: Kill container on stronger Pi
+Spec-4: Kill weaker Pi
+Spec-5: Kill stronger Pi
+"""
 
 experiments = {
-1 : ('ot-spec-1_lt-1_feat-1.txt', [lt_feat_1])
+1 : ('ot-spec-1_lt-1_feat-1.txt', [lt_feat_1]),
+2 : ('ot-spec-1_ltkube-1_feat-1.txt', [minikube_feat_1]),
+3 : ('ot-spec-1_piDock-1_feat-1.txt', [rpi1_feat_1]),
+4 : ('ot-spec-1_piKube-2_feat-1.txt', [rpiKb_feat_1, rpiKb_feat_1]),
+5 : ('ot-spec-2_piKube-2_feat-1.txt', [rpiKb_feat_1, rpiKb_feat_1]),
+6 : ('ot-spec-3_piKube-2_feat-1.txt', [rpiKb_feat_1, rpiKb_feat_1]),
+7 : ('ot-spec-4_piKube-2_feat-1.txt', [rpiKb_feat_1, rpiKb_feat_1]),
+8 : ('ot-spec-5_piKube-2_feat-1.txt', [rpiKb_feat_1, rpiKb_feat_1]),
 }
 
 """
@@ -246,7 +270,7 @@ Experiment Configuration
 IMAGE_DIR = "../../../face_examples/resolution/";
 OUPUT_DIR = "../raw_data/";
 EXP, service_list = experiments[int(sys.argv[1])];
-TIME_LIMIT = 2;
+TIME_LIMIT = 30;
 # EXP, service_list = ('test_output.txt', [lt_feat_1, lt_feat_11, lt_feat_111])
 RUNS = 1;
 frame_copies = 100;
@@ -277,7 +301,7 @@ Actual Experiment
 # img_list = map(lambda (f, res): (cv2.imread("%s%s" % (IMAGE_DIR, f)), res), init_img_list);
 # img_list = map(lambda (f, res): (cv2.cvtColor(f, cv2.COLOR_BGR2GRAY), res), img_list);
 # print img_list
-init_img, size = load_images()[1]
+init_img, size = load_images()[2]
 # print init_img
 init_img = cv2.imread("%s%s" % (IMAGE_DIR, init_img));
 # print init_img
@@ -310,9 +334,9 @@ for i in range(frame_copies):
 service_list = map(lambda x: (socket.socket(socket.AF_INET, socket.SOCK_STREAM), x), service_list);
 map(lambda (x, y): x.connect(y), service_list);
 service_socket_list = map(lambda (x, _): x, service_list);
-service_context = map(lambda x: (x, 
-    (Thread(target = send_thread, args = (img_queue, x, )), 
-        Thread(target = recv_thread, args = (out_queue, x, mysocket(x))))), service_socket_list);
+service_context = map(lambda (x, y): (x, 
+    (Thread(target = send_thread, args = (img_queue, y, x, )), 
+        Thread(target = recv_thread, args = (out_queue, y, x, mysocket(x))))), service_list);
 map(lambda (_, (s, r)): (s.setDaemon(True), r.setDaemon(True)), service_context);
 map(lambda (_, (s, r)): (s.start(), r.start()), service_context);
 

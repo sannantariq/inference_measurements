@@ -124,10 +124,13 @@ else:
 
 PATH_1 = "/data/src/inference_measurements/cascades/haarcascades"
 PATH_2 = "../../cascades/haarcascades/"
+PATH_3 = "/app/inference_measurements/cascades/haarcascades"
 if os.path.exists(PATH_1):
     PATH = PATH_1;
 elif os.path.exists(PATH_2):
     PATH = PATH_2;
+elif os.path.exists(PATH_3):
+    PATH = PATH_3;
 else:
     print "Error: Cascades not found!. Exiting..."
     sys.exit();
