@@ -93,7 +93,10 @@ def consume_thread(task_queue, current_feat):
             data, client = task_queue.get();
             reply = process_data(data, current_feat)
             # reply = MY_NAME + " says: " + data;
-            mysocket(client).mysend(reply);
+            try:
+                mysocket(client).mysend(reply);
+            except socket.error:
+                print "Error in socket"
             task_queue.task_done();
             # print "Reply sent";
 

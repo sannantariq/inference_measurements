@@ -236,7 +236,7 @@ rpiKb_feat_3 = (rpi1_ip, 31425)
 
 
 experiments = {
-1 : ('ot-spec-1_lt-1_feat-1.txt', [])
+1 : ('ot-spec-1_lt-1_feat-1.txt', [lt_feat_1])
 }
 
 """
@@ -246,9 +246,10 @@ Experiment Configuration
 IMAGE_DIR = "../../../face_examples/resolution/";
 OUPUT_DIR = "../raw_data/";
 EXP, service_list = experiments[int(sys.argv[1])];
+TIME_LIMIT = 2;
 # EXP, service_list = ('test_output.txt', [lt_feat_1, lt_feat_11, lt_feat_111])
 RUNS = 1;
-frame_copies = 250;
+frame_copies = 100;
 
 
 
@@ -290,10 +291,9 @@ for i in range(frame_copies):
     img_queue.put(init_img);
     # img_queue.put("Hello World" + str(i))
 
-service_list = [
-lt_feat_1,
-lt_feat_1
-]
+# service_list = [
+# lt_feat_1
+# ]
 
 # addr = lt_feat_1
 # service = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
@@ -327,17 +327,22 @@ start_time = time.time();
 #     print out_queue.get();
 
 results = []
-# c_p = 0;
-s = out_queue.qsize();
-while s <= frame_copies:
-    # c = out_queue.qsize() - c_p;
+# # c_p = 0;
+# s = out_queue.qsize();
+# while s <= frame_copies:
+#     # c = out_queue.qsize() - c_p;
+#     results.append((time.time() - start_time, s));
+#     time.sleep(1)
+#     s = out_queue.qsize();
+#     if out_queue.qsize() == frame_copies:
+#         print "All tasks received!"
+#         results.append((time.time() - start_time, s))
+#         break;
+
+while time.time() - start_time < TIME_LIMIT:
+    s = out_queue.qsize();
     results.append((time.time() - start_time, s));
     time.sleep(1)
-    s = out_queue.qsize();
-    if out_queue.qsize() == frame_copies:
-        print "All tasks received!"
-        results.append((time.time() - start_time, s))
-        break;
 
 print results;
 
