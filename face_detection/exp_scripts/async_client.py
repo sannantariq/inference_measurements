@@ -174,15 +174,24 @@ def generateQueues(task_list):
 def send_thread(img_queue, service_addr, service_socket):
     while True:
         if not img_queue.empty():
-
+            # print "Sending task..."
             try:
                 mysocket(service_socket).mysend(pickle.dumps(img_queue.get()));
                 img_queue.task_done();
-            except socket.error:
-                service_socket.close();
-                service_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                service_socket.connect(service_addr);
+            except socket.error as err:
+                # service_socket.close();
+                print "Error while sending!!";
+                print err
+                break;
+                # service_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                # c = 1;
+                # while c != 0:
+                #     c = service_socket.connect_ex(service_addr);
+                #     print c
+                #     time.sleep(1);
                 # pass
+            if img_queue.empty():
+                print "Ran out of frames to send...";
 
 
 def recv_thread(out_queue, service_addr, service_socket, service):
@@ -196,15 +205,55 @@ def recv_thread(out_queue, service_addr, service_socket, service):
             elif service.buffer == '':
                 service_socket.close()
                 break
-        except socket.error:
-            service_socket.close();
-            service_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
-            service_socket.connect(service_addr);
-            service = mysocket(service_socket);
+        except socket.error as err:
+            # service_socket.close();
+            print "Error while receiveing!"
+            print err
+            break;
+            # service_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
+            # c = 1;
+            # while c != 0:
+            #     c = service_socket.connect_ex(service_addr);
+            #     print c
+            #     time.sleep(1);
+            # service = mysocket(service_socket);
                 # pass
 
 
         # out_queue.put(response);
+
+def keep_threads_alive(service_context, img_queue, out_queue):
+    while True:
+        closed_threads = filter(lambda (i, x): x == False, enumerate(map(lambda (_, _z, (st, rt)): st.is_alive() and rt.is_alive(), service_context)))
+        for i, t in closed_threads:
+            print "Restarting Thread %d" % i;
+
+            old_sock, y, _ = service_context[i];
+            old_sock.close();
+            x = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
+            conn = False;
+            while not conn:
+                print "Attempting Connection..."
+                try:
+                    x.connect(y);
+                    conn = True;
+                except socket.error as err:
+                    print "Failed with error: %s" % err;
+                    time.sleep(1);
+            # x.connect(y);
+
+            st, rt = (Thread(target = send_thread, args = (img_queue, y, x, )), 
+            Thread(target = recv_thread, args = (out_queue, y, x, mysocket(x))));
+
+            service_context[i] = (x, y, (st, rt));
+
+            st.setDaemon(True);
+            rt.setDaemon(True);
+            st.start();
+            rt.start();
+
+
+
 
 
 rpi1_ip = '172.20.64.55'
@@ -239,7 +288,7 @@ rpiDock_feat_1 = ('172.20.64.110', 50000);
 
 rpiDock2_feat_1 = ('172.20.64.223', 8080);
 
-rpiKb_feat_1 = (rpi1_ip, 31482);
+rpiKb_feat_1 = (rpi1_ip, 31024);
 rpiKb_feat_2 = (rpi1_ip, 32745)
 rpiKb_feat_3 = (rpi1_ip, 31425)
 minikube_feat_1 = ('192.168.99.100', 32584);
@@ -253,6 +302,7 @@ Spec-5: Kill stronger Pi
 """
 
 experiments = {
+0 : ('ot-test.txt', [rpiKb_feat_1, rpiKb_feat_1]),
 1 : ('ot-spec-1_lt-1_feat-1.txt', [lt_feat_1]),
 2 : ('ot-spec-1_ltkube-1_feat-1.txt', [minikube_feat_1]),
 3 : ('ot-spec-1_piDock-1_feat-1.txt', [rpi1_feat_1]),
@@ -270,10 +320,11 @@ Experiment Configuration
 IMAGE_DIR = "../../../face_examples/resolution/";
 OUPUT_DIR = "../raw_data/";
 EXP, service_list = experiments[int(sys.argv[1])];
-TIME_LIMIT = 30;
+TIME_LIMIT = 60;
 # EXP, service_list = ('test_output.txt', [lt_feat_1, lt_feat_11, lt_feat_111])
 RUNS = 1;
-frame_copies = 100;
+frame_copies = 500;
+IMG = 0;
 
 
 
@@ -301,7 +352,7 @@ Actual Experiment
 # img_list = map(lambda (f, res): (cv2.imread("%s%s" % (IMAGE_DIR, f)), res), init_img_list);
 # img_list = map(lambda (f, res): (cv2.cvtColor(f, cv2.COLOR_BGR2GRAY), res), img_list);
 # print img_list
-init_img, size = load_images()[2]
+init_img, size = load_images()[IMG]
 # print init_img
 init_img = cv2.imread("%s%s" % (IMAGE_DIR, init_img));
 # print init_img
@@ -334,11 +385,15 @@ for i in range(frame_copies):
 service_list = map(lambda x: (socket.socket(socket.AF_INET, socket.SOCK_STREAM), x), service_list);
 map(lambda (x, y): x.connect(y), service_list);
 service_socket_list = map(lambda (x, _): x, service_list);
-service_context = map(lambda (x, y): (x, 
+service_context = map(lambda (x, y): (x, y,
     (Thread(target = send_thread, args = (img_queue, y, x, )), 
-        Thread(target = recv_thread, args = (out_queue, y, x, mysocket(x))))), service_list);
-map(lambda (_, (s, r)): (s.setDaemon(True), r.setDaemon(True)), service_context);
-map(lambda (_, (s, r)): (s.start(), r.start()), service_context);
+        Thread(target = recv_thread, args = (out_queue, y, x, mysocket(x), )))), service_list);
+map(lambda (_, _z, (s, r)): (s.setDaemon(True), r.setDaemon(True)), service_context);
+map(lambda (_, _z, (s, r)): (s.start(), r.start()), service_context);
+
+health_thread = Thread(target = keep_threads_alive, args = (service_context, img_queue, out_queue, ))
+health_thread.setDaemon(True);
+health_thread.start();
 
 start_time = time.time();
 

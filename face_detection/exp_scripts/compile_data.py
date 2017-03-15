@@ -1,4 +1,4 @@
-import os, argparse
+import os, argparse, sys
 
 class IllegalFileError(Exception):
     """docstring for IllegalFileError"""
@@ -32,12 +32,20 @@ class ExpFile(object):
         return "(%s-features:%s | %s)" % (self.exp_name, self.features, repr(self.devices))
 
     def parseFile(self):
+        # print self.filename
+        # print "-"*5
         with open(self.filename) as f:
             raw = f.readlines();
-
+        
         raw = map(lambda x: x.strip(), raw)
         raw = map(lambda x : x.split('\t'), raw)
+        
         raw = [(x, y) for (x, _, y) in raw]
+        # try:
+        #     raw = [(x, y) for (x, _, y) in raw]
+        # except:
+        #     print raw, self.filename;
+        #     sys.exit()
         self.data = raw;
 
     def deviceString(self):
@@ -105,6 +113,7 @@ def createOutput(data, outfile, x_label):
 
 
 PATH = '../raw_data';
+OUT_PATH = "../compiled_data/"
 os.chdir(PATH);
 
 dir_list = filter(lambda x: x[-3:] == 'txt', os.listdir('./'));
@@ -123,5 +132,5 @@ for f in dir_list:
 
 
 data = compile(exps, 'res-V-time', '1')
-createOutput(data, 'test_output.txt', 'Size(MB)');
+createOutput(data, '%stest_output.txt' % OUT_PATH, 'Size(MB)');
 # parseFile('faces-V-time_PIDocker-2_feat-3.txt')

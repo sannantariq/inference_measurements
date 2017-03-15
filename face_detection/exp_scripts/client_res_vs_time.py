@@ -192,7 +192,7 @@ rpiDock_feat_1 = ('172.20.64.110', 50000);
 
 rpiDock2_feat_1 = ('172.20.64.223', 8080);
 
-rpiKb_feat_1 = (rpi1_ip, 32503)
+rpiKb_feat_1 = (rpi1_ip, 32464)
 rpiKb_feat_2 = (rpi1_ip, 32745)
 rpiKb_feat_3 = (rpi1_ip, 31425)
 
@@ -227,10 +227,13 @@ experiments = {
 'exp23': ('res-V-time_PIDocker-2_feat-1.txt', [rpi1_feat_1, rpi2_feat_1]),
 'exp24': ('res-V-time_PIDocker-2_feat-2.txt', [rpi1_feat_2, rpi2_feat_2]),
 'exp25': ('res-V-time_PIDocker-2_feat-3.txt', [rpi1_feat_3, rpi2_feat_3]),
-'exp26': ('res-V-time_PIKube-2_feat-1.txt', [rpiKb_feat_1]),
-'exp27': ('res-V-time_PIKube-2_feat-2.txt', [rpiKb_feat_2]),
-'exp28': ('res-V-time_PIKube-2_feat-3.txt', [rpiKb_feat_3]),
+'exp26': ('res-V-time_PIKube-1_feat-1.txt', [rpiKb_feat_1]),
+'exp27': ('res-V-time_PIKube-1_feat-2.txt', [rpiKb_feat_2]),
+'exp28': ('res-V-time_PIKube-1_feat-3.txt', [rpiKb_feat_3]),
 'exp29': ('res-V-time_proc_PIDocker.txt', [rpi2_feat_1]),
+'exp30': ('res-V-time_PIKube-2_feat-1.txt', [rpiKb_feat_1, rpiKb_feat_1]),
+'exp31': ('res-V-time_PIKube-2_feat-2.txt', [rpiKb_feat_2, rpiKb_feat_2]),
+'exp32': ('res-V-time_PIKube-2_feat-3.txt', [rpiKb_feat_3, rpiKb_feat_3]),
 }
 
 """
@@ -241,7 +244,7 @@ IMAGE_DIR = "../../../face_examples/resolution/";
 OUPUT_DIR = "../raw_data/";
 EXP, service_list = experiments[sys.argv[1]];
 # EXP, service_list = ('test_output.txt', [lt_feat_1, lt_feat_11, lt_feat_111])
-RUNS = 1;
+RUNS = 2;
 
 
 
@@ -299,7 +302,7 @@ while not input_queue.empty():
     can_run = False;
     results[i] = processResults(local_dict.values());
     # print i, overall_time, overall_time/RUNS
-    # results[i] = (overall_time, overall_time/RUNS)
+    results[i] = (overall_time, overall_time/RUNS)
 
 # print results
 print "-"*20
