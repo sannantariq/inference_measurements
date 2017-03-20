@@ -160,9 +160,10 @@ def generateQueues(task_list):
         input_queue.put((i, iQueue));
     return input_queue;
 
-rpi1_ip = '172.20.64.55'
-rpi2_ip = '172.20.64.180'
-
+rpi1_ip = '172.20.64.142'
+rpi2_ip = '172.20.64.146'
+rpired_ip = '172.20.64.142'
+kube_ip = '172.20.64.55'
 
 kb_ip = '10.108.225.170'
 
@@ -192,9 +193,9 @@ rpiDock_feat_1 = ('172.20.64.110', 50000);
 
 rpiDock2_feat_1 = ('172.20.64.223', 8080);
 
-rpiKb_feat_1 = (rpi1_ip, 32464)
-rpiKb_feat_2 = (rpi1_ip, 32745)
-rpiKb_feat_3 = (rpi1_ip, 31425)
+rpiKb_feat_1 = (kube_ip, 32321)
+rpiKb_feat_2 = (kube_ip, 32745)
+rpiKb_feat_3 = (kube_ip, 31425)
 
 
 experiments = {
