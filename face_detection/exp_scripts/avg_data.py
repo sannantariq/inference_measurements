@@ -18,8 +18,7 @@ class ExpFile(object):
         'ed' : 'edison',
         'pidocker': 'piDocker',
         'lt' : 'Laptop',
-        'pikube' : 'piKube',
-        'pikubeavg' : 'piKubeAvg'
+        'pikube' : 'piKube'
         }
         self.initialize()
         
@@ -112,26 +111,52 @@ def createOutput(data, outfile, x_label):
     with open(outfile, 'w') as f:
         f.writelines(write_data);
 
+def add_data_to_dict(filename, d):
+	with open(filename) as f:
+		raw = f.readlines();
+	raw = map(lambda x: x.strip(), raw);
+	raw = map(lambda x: x.split(), raw);
+	raw = map(lambda x: (x[0], x[2]), raw)
+	for k, v in raw:
+		l = d.get(k, []);
+		l.append(v);
+		d[k] = l;
 
 PATH = '../raw_data';
 OUT_PATH = "../compiled_data/"
 os.chdir(PATH);
 
-dir_list = filter(lambda x: x[-3:] == 'txt', os.listdir('./'));
-# print dir_list
+dir_list = filter(lambda x: x[:3] == 'avg',filter(lambda x: x[-3:] == 'txt', os.listdir('./')));
+print dir_list
+compile_dict = {}
+for f in dir_list:
+	add_data_to_dict(f, compile_dict);
+
+
+data = compile_dict.items();
+data.sort()
+# print data[0]
+data = map(lambda (x, y): (x, sum(map(float, y))/(len(y) * 1.0)), data);
+print data
+
+outfile = "%s%s" % (OUT_PATH, 'res-V-time_PIKubeAVG-2_feat-1.txt');
+with open(outfile, "w") as f:
+	for i in range(len(data)):
+		f.write("%s\t%f\t%f\n" % (data[i][0], data[i][1], data[i][1]));
+
 # ExpFile('faces-V-time_PI-2_feat-3.txt')e
 # dir_list = map(lambda x: x.split('_'), dir_list)
-exps = []
-for f in dir_list:
-    try:
-        e = ExpFile(f);
-        exps.append(e);
-    except:
-        pass;
+# exps = []
+# for f in dir_list:
+#     try:
+#         e = ExpFile(f);
+#         exps.append(e);
+#     except:
+#         pass;
 
 # print map(str, exps);
 
 
-data = compile(exps, 'res-V-time', '1')
-createOutput(data, '%stest_output.txt' % OUT_PATH, 'Size(MB)');
-# parseFile('faces-V-time_PIDocker-2_feat-3.txt')
+# data = compile(exps, 'res-V-time', '1')
+# createOutput(data, '%stest_output.txt' % OUT_PATH, 'Size(MB)');
+# # parseFile('faces-V-time_PIDocker-2_feat-3.txt')

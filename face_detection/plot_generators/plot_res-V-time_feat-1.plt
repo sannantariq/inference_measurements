@@ -13,7 +13,8 @@ plot "../compiled_data/test_output.txt" using 1:5 title col with linespoints, \
 	"../compiled_data/test_output.txt" using 1:8 title col with linespoints, \
 	"../compiled_data/test_output.txt" using 1:9 title col with linespoints, \
 	"../compiled_data/test_output.txt" using 1:10 title col with linespoints, \
-	"../compiled_data/test_output.txt" using 1:11 title col with linespoints
+	"../compiled_data/test_output.txt" using 1:11 title col with linespoints, \
+	"../compiled_data/test_output.txt" using 1:12 title col with linespoints
 #set terminal png size 2560,1920 enhanced font 'NimbusSanL-Regu' 14
 #set output "../plot_outputs/fig_faces-V-time_feat-3.png"
 #replot
