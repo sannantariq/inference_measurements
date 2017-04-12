@@ -193,7 +193,7 @@ rpiDock_feat_1 = ('172.20.64.110', 50000);
 
 rpiDock2_feat_1 = ('172.20.64.223', 8080);
 
-rpiKb_feat_1 = (kube_ip, 32321)
+rpiKb_feat_1 = (kube_ip, 31075)
 rpiKb_feat_2 = (kube_ip, 32745)
 rpiKb_feat_3 = (kube_ip, 31425)
 
@@ -219,7 +219,7 @@ experiments = {
 'exp17': ('res-V-time_PI-2_ED-2_feat-3.txt', [rpi1_feat_3, rpi2_feat_3, ed1_feat_3, ed2_feat_3]),
 'exp18': ('res-V-time_PIDocker-1_feat-1.txt', [rpiDock_feat_1]),
 'exp19': ('res-V-time_PIDocker-2_feat-1.txt', [rpiDock_feat_1, rpiDock2_feat_1]),
-'exp001' : ('test_output.txt', [rpi1_feat_1]),
+'exp001' : ('test_output.txt', [rpiKb_feat_1, rpiKb_feat_1]),
 'exp002' : ('test_output.txt', [lt_feat_1, lt_feat_11]),
 'exp003' : ('test_output.txt', [lt_feat_1, lt_feat_11, lt_feat_111]),
 'exp20': ('res-V-time_PIDocker-1_feat-1.txt', [rpi1_feat_1]),
