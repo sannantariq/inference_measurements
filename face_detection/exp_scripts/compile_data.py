@@ -19,7 +19,8 @@ class ExpFile(object):
         'pidocker': 'piDocker',
         'lt' : 'Laptop',
         'pikube' : 'piKube',
-        'pikubeavg' : 'piKubeAvg'
+        'pikubeavg' : 'piKubeAvg',
+        'pikubeddsched' : 'piKube-PerDeviceScheduler'
         }
         self.initialize()
         
