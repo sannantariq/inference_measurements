@@ -18,10 +18,11 @@ def get_resource(rs):
 	return json.loads(output);
 
 def desc_resource(rs):
-	output, error = run_cmd("kubectl -o json describe %s" % (rs));
+	output, error = run_cmd("kubectl describe %s" % (rs));
 	if error:
 		return error;
-	return json.loads(output);
+	# return json.loads(output);
+	return output;
 
 def get_pods(p='po'):
 	return get_resource(p);
@@ -42,12 +43,15 @@ def kill_resource(rs, name):
 	return output;
 
 # print get_nodes()['items'][0]['metadata']
-def pods_by_nodes():
-	info = get_nodes();
+def pods_by_nodes(info = None):
+	if not info:
+		print "info not provided"
+		info = get_nodes();
 	nodeNames = {};
 	for i in range(len(info['items'])):
 		nodeNames[info['items'][i]['metadata']['name']] = [];
 	# print nodeNames;
+	# if not info:
 	info = get_pods();
 	for i in range(len(info['items'])):
 		nodeNames[info['items'][i]['spec']['nodeName']].append(info['items'][i]['metadata']['name']);
@@ -88,11 +92,37 @@ def get_node_names(info):
 	return names
 
 
-info = get_nodes()
-names = get_node_names(info);
-for name in names:
-	print name, node_ready(info, name)
-print pods_by_nodes()
+def get_node_resource(node = ""):
+	output, error = run_cmd("kubectl top nodes %s" % node);
+	if error:
+		return error;
+	return output;
+
+
+# def get_node_metrics():
+	# output, error = run_cmd("kubectl ")
+
+print get_node_resource();
+
+i = 0;
+N = 10;
+# info = get_nodes();
+print "got info";
+while i < 10:
+	i += 1;
+	# info = get_nodes();
+	# print pods_by_nodes(info);
+	# for node in get_node_names(info):
+	# 	if  node_ready(info, node):
+	# 		print pods_by_nodes(info)[node]
+
+
+
+# info = get_nodes()
+# names = get_node_names(info);
+# for name in names:
+# 	print name, node_ready(info, name)
+# print pods_by_nodes()
 # time.sleep(30)
 
 
