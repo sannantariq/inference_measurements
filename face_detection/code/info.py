@@ -116,27 +116,36 @@ def parse_top_out(s):
 
 
 def record_info(outfile, t):
-	records = {};
+	# records = {};
+	records = [];
 	curr_time = time.time();
 	time_elapsed = time.time() - curr_time;
 	while time_elapsed < t:
 		output, error = get_node_resource();
+		if error:
+			print error;
+			return;
+		record = parse_top_out(output);
+		# records[time_elapsed] = {}
+		time_elapsed = time.time() - curr_time;
+		records.append((time_elapsed, record))
+	return records;
 
-		records[time_elapsed] = {}
+print record_info("s", 10);
 
 
 # def get_node_metrics():
 	# output, error = run_cmd("kubectl ")
 
-print get_node_resource();
+# print get_node_resource();
 
-i = 0;
-N = 10;
-# info = get_nodes();
-print "got info";
-print parse_top_out(get_node_resource())
-while i < 10:
-	i += 1;
+# i = 0;
+# N = 10;
+# # info = get_nodes();
+# print "got info";
+# # print parse_top_out(get_node_resource())
+# while i < 10:
+# 	i += 1;
 	# info = get_nodes();
 	# print pods_by_nodes(info);
 	# for node in get_node_names(info):
