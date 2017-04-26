@@ -111,7 +111,7 @@ def parse_top_out(s):
 		mem_s = int(mem[:-2]);
 		mem_pc = int(memp[:-1]);
 		# print n, int(cpu[:-1]), int(cpu[:-1])
-		result.append(name, (cpu_s, cpu_pc), (mem_s, mem_pc));
+		result.append((name, (cpu_s, cpu_pc), (mem_s, mem_pc)));
 	return result
 
 
