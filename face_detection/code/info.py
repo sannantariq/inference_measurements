@@ -133,7 +133,7 @@ def record_info(outfile, t):
 	lines.append(','.join(top_string));
 	# print top_string;
 	for (t, r) in records:
-		lines.append(','.join([t] + ["%d,%d" % (r[k][0][0], r[k][1][0]) for k in keys]));
+		lines.append(','.join(["%.2f" % t] + ["%d,%d" % (r[k][0][0], r[k][1][0]) for k in keys]));
 	for line in lines:
 		line[-1] = line[-1] + "\n";
 	return lines;
