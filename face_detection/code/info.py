@@ -127,7 +127,6 @@ def record_info(outfile, t):
 		# records[time_elapsed] = {}
 		time_elapsed = time.time() - curr_time;
 		records.append((time_elapsed, record))
-	for 
 
 print record_info("s", 10);
 
