@@ -127,8 +127,13 @@ def record_info(outfile, t):
 		# records[time_elapsed] = {}
 		time_elapsed = time.time() - curr_time;
 		records.append((time_elapsed, record))
+	keys = record.keys();
+	top_string = ["Time(s)"] + ["%s-CPU,%s-MEM" % (k, k) for k in keys]
+	print top_string;
+	for (t, r) in records:
+		print t, ["%d,%d" % (r[k][0][0], r[k][1][0]) for k in keys]
 
-print record_info("s", 10);
+print record_info("s", 3);
 
 
 # def get_node_metrics():
