@@ -103,7 +103,8 @@ def parse_top_out(s):
 	s = map(lambda x: x.strip(), s.strip().split("\n"));
 	s = s[1:];
 	s = map(lambda x: x.split(), s);
-	result = []
+	result = {}
+
 	for [n, cpu, cpup, mem, memp] in s:
 		name = n;
 		cpu_s = int(cpu[:-1]);
@@ -111,7 +112,7 @@ def parse_top_out(s):
 		mem_s = int(mem[:-2]);
 		mem_pc = int(memp[:-1]);
 		# print n, int(cpu[:-1]), int(cpu[:-1])
-		result.append((name, (cpu_s, cpu_pc), (mem_s, mem_pc)));
+		result[name] =((cpu_s, cpu_pc), (mem_s, mem_pc));
 	return result
 
 
@@ -126,7 +127,7 @@ def record_info(outfile, t):
 		# records[time_elapsed] = {}
 		time_elapsed = time.time() - curr_time;
 		records.append((time_elapsed, record))
-	return records;
+	for 
 
 print record_info("s", 10);
 
