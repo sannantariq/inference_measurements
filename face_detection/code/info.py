@@ -121,10 +121,7 @@ def record_info(outfile, t):
 	curr_time = time.time();
 	time_elapsed = time.time() - curr_time;
 	while time_elapsed < t:
-		output, error = get_node_resource();
-		if error:
-			print error;
-			return;
+		output = get_node_resource();
 		record = parse_top_out(output);
 		# records[time_elapsed] = {}
 		time_elapsed = time.time() - curr_time;
