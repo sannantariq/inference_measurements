@@ -98,6 +98,22 @@ def get_node_resource(node = ""):
 		return error;
 	return output;
 
+def parse_top_out(s):
+	s = map(lambda x: x.strip(), s.strip().split("\n"));
+	s = s[1:];
+	s = map(lambda x: x.split(), s);
+	for [n, cpu, cpup, mem, memp] in s:
+		print n, cpup
+
+def record_info(outfile, t):
+	records = {};
+	curr_time = time.time();
+	time_elapsed = time.time() - curr_time;
+	while time_elapsed < t:
+		output, error = get_node_resource();
+
+		records[time_elapsed] = {}
+
 
 # def get_node_metrics():
 	# output, error = run_cmd("kubectl ")
@@ -108,6 +124,7 @@ i = 0;
 N = 10;
 # info = get_nodes();
 print "got info";
+parse_top_out(get_node_resource())
 while i < 10:
 	i += 1;
 	# info = get_nodes();
