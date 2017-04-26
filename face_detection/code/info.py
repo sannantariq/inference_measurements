@@ -99,11 +99,21 @@ def get_node_resource(node = ""):
 	return output;
 
 def parse_top_out(s):
+
 	s = map(lambda x: x.strip(), s.strip().split("\n"));
 	s = s[1:];
 	s = map(lambda x: x.split(), s);
+	result = []
 	for [n, cpu, cpup, mem, memp] in s:
-		print n, cpup
+		name = n;
+		cpu_s = int(cpu[:-1]);
+		cpu_pc = int(cpup[:-1]);
+		mem_s = int(mem[:-2]);
+		mem_pc = int(memp[:-1]);
+		# print n, int(cpu[:-1]), int(cpu[:-1])
+		result.append(name, (cpu_s, cpu_pc), (mem_s, mem_pc));
+	return result
+
 
 def record_info(outfile, t):
 	records = {};
@@ -124,7 +134,7 @@ i = 0;
 N = 10;
 # info = get_nodes();
 print "got info";
-parse_top_out(get_node_resource())
+print parse_top_out(get_node_resource())
 while i < 10:
 	i += 1;
 	# info = get_nodes();
