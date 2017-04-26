@@ -134,11 +134,12 @@ def record_info(outfile, t):
 	# print top_string;
 	for (t, r) in records:
 		lines.append(','.join(["%.2f" % t] + ["%d,%d" % (r[k][0][0], r[k][1][0]) for k in keys]));
-	for line in lines:
-		line[-1] = line[-1] + "\n";
-	return lines;
+	lines = map(lambda x: x+"\n", lines);
+	with open(outfile, "w") as f:
+		f.writelines(lines);
+	
 
-print record_info("s", 3);
+print record_info("../raw_data/metrics_60sec.txt", 3);
 
 
 # def get_node_metrics():
